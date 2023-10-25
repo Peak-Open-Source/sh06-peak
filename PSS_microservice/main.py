@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import src.uniprot_parser as uniprot_parser
 
 app = FastAPI()
 
@@ -27,8 +28,8 @@ def find_matching_structures(sequence: str):
 # Endpoint to retrieve protein structures by Uniprot ID
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
-    # logic for getting protein from uniprot by id
-    return
+    raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
+    return [x.as_dict() for x in uniprot_parser.parse_uniprot_data(uniprot_id, raw_uniprot_data)]
 
 
 # Endpoint to retrieve protein structures by sequence

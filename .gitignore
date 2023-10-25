@@ -25,8 +25,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-.idea
-launch.json
+PSS_microservice/.idea/
+PSS_microservice/launch.json
+PSS_microservice/__pycache__/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -13,7 +13,7 @@ def get_raw_uniprot_data(uniprot_id: str):
         valid_references = [x for x in references if x['database'] in VALID_DATABASES]
         return valid_references
     else:
-        return {'code': result.status_code, 'reason': result.reason}
+        return {'code': result.status_code, 'error': result.reason}
     
 def parse_uniprot_data(uniprot_dbs: list):
     parsed_proteins = []

@@ -15,7 +15,7 @@ def get_raw_uniprot_data(uniprot_id: str):
     else:
         return {'code': result.status_code, 'reason': result.reason}
     
-def parse_uniprot_data(uniprot_id: str, uniprot_dbs: list):
+def parse_uniprot_data(uniprot_dbs: list):
     parsed_proteins = []
     for db_reference in uniprot_dbs:
         protein_ref = Protein(db_reference['id'])
@@ -52,6 +52,6 @@ def parse_uniprot_data(uniprot_id: str, uniprot_dbs: list):
 if __name__ == "__main__":
     TEST_ID = "P05067"
     reference_list = get_raw_uniprot_data(TEST_ID)
-    parsed_proteins = parse_uniprot_data(TEST_ID, reference_list)
+    parsed_proteins = parse_uniprot_data(reference_list)
     for protein in parsed_proteins:
         print("\n", protein)

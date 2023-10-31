@@ -1,5 +1,10 @@
 import json
 
+"""
+Class we use to handle direct operations on protein data, 
+and also as an effective way of storing the data.
+"""
+
 class Protein:
     def __init__(self, id, method = "Unknown", resolution = "Unknown", coverage = "Unknown"):
         self._id = id
@@ -8,12 +13,13 @@ class Protein:
         self._coverage = coverage
 
     def as_dict(self):
+        # Return all instance information into an effective dictionary to be displayed in the combined JSON on the endpoint.
         return {
             'id': self.id,
             'method': self.method,
             'resolution': self.resolution,
             'coverage': self.coverage
-        }
+        } 
     
     @property
     def id(self):

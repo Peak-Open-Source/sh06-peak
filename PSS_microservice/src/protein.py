@@ -50,4 +50,4 @@ class Protein:
         self._coverage = val
 
     def __str__(self):
-        return f'{self.uniprot_id}\n  - Method: {self.method}\n  - Resolution: {self.resolution}\n  - Coverage: {self.coverage}'
+        return f'{self.id}\n  - Method: {self.method}\n  - Resolution: {self.resolution}\n  - Coverage: {self.coverage}'

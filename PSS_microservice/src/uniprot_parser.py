@@ -58,7 +58,6 @@ def parse_uniprot_data(uniprot_dbs: list):
 
     return parsed_proteins
 
-
 if __name__ == "__main__":
     TEST_ID = "P05067"
     reference_list = get_raw_uniprot_data(TEST_ID)

@@ -29,8 +29,8 @@ def find_matching_structures(sequence: str):
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
-    if not 'code' in raw_uniprot_data:
-        return [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)]
+    if not 'code' in raw_uniprot_data: # If it didn't throw an error
+        return [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)] # Combine the dictionaries
     else:
         return raw_uniprot_data
 

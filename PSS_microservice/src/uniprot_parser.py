@@ -56,7 +56,8 @@ def parse_uniprot_data(uniprot_dbs: list):
         if valid: # Need to check that there was at least 1 valid property existed in the entry
             parsed_proteins.append(protein_ref)
 
-    return parsed_proteins
+        filtered_proteins = [protein for protein in parsed_proteins if protein.method != "NMR"]
+    return filtered_proteins
 
 if __name__ == "__main__":
     TEST_ID = "P05067"

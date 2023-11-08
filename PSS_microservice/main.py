@@ -1,5 +1,10 @@
 from fastapi import FastAPI
 import src.uniprot_parser as uniprot_parser
+import requests
+from fastapi.responses import FileResponse, Response
+import json
+import tarfile
+import os
 
 app = FastAPI()
 
@@ -34,6 +39,22 @@ def retrieve_by_uniprot_id(uniprot_id):
     else:
         return raw_uniprot_data
 
+@app.get('/download_pdb_by_id/{pdb_id}')
+def download_pdb_by_id(pdb_id):
+    archive_url = f"https://www.ebi.ac.uk/pdbe/download/api/pdb/entry/archive?data_format=pdb&id={pdb_id}"
+    archive_result = requests.get(archive_url)
+    if archive_result.ok:
+        download_url= json.loads(archive_result.content)["url"]
+        print(download_url)
+        filename = f'{pdb_id}.tar.gz'
+        response = requests.get(download_url)
+        file_content = response.content
+        with open ("tmp.tar.gz", 'wb') as tmp:
+            tmp.write(file_content)
+        with tarfile.open('tmp.tar.gz', 'r:gz') as tar:
+            tar.extractall(f"./{pdb_id}")
+        os.remove("tmp.tar.gz")
+        return "slay"
 
 # Endpoint to retrieve protein structures by sequence
 @app.post('/retrieve_by_sequence')

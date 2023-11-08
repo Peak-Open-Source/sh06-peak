@@ -19,6 +19,7 @@ class Coverage:
         return self._lower_bound
     
     def merge(self, other_cov):
+        # If within bounds, merge into one larger coverage and return valid
         if self.lower_bound >= other_cov.lower_bound:
             if other_cov.upper_bound > self.lower_bound:
                 return [Coverage(other_cov.lower_bound, max(self.upper_bound, other_cov.upper_bound))], True
@@ -75,6 +76,7 @@ class Protein:
                 self._coverage_list = updated_list
 
     def calculate_coverages(self) -> int:
+        # Running count of all coverage ranges, call after merge preferably unless exceptional circumstances
         count = 0
         for coverage in self._coverage_list:
             count += (coverage.upper_bound - coverage.lower_bound)

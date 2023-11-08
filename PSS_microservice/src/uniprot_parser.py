@@ -1,6 +1,6 @@
 import requests
 import json
-from src.protein import Protein
+from protein import Protein
 
 VALID_DATABASES = ["PDB", "AlphaFoldDB"]
 
@@ -54,10 +54,9 @@ def parse_uniprot_data(uniprot_dbs: list):
                     protein_ref.coverage = largest
 
         if valid: # Need to check that there was at least 1 valid property existed in the entry
-            parsed_proteins.append(protein_ref)
+            parsed_proteins.append(protein_ref)   
 
-        filtered_proteins = [protein for protein in parsed_proteins if protein.method != "NMR"]
-    return filtered_proteins
+    return parsed_proteins
 
 if __name__ == "__main__":
     TEST_ID = "P05067"

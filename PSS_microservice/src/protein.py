@@ -31,6 +31,8 @@ class Protein:
     
     @method.setter
     def method(self, val):
+        if val == "NMR":
+            self.resolution = "10"
         self._method = val
     
     @property

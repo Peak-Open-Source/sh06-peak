@@ -20,46 +20,17 @@ The application should be accessed via REST API or a python script/compiled bina
 Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 
 and requirements.
 
+PSS \
 ├── src \
-│   ├── controller \
-│   │   ├── **/*.css \
-│   ├── views
-│   ├── model
-│   ├── index.js
-├── public
-│   ├── css
-│   │   ├── **/*.css
-│   ├── images
-│   ├── js
-│   ├── index.html
-├── dist (or build
-├── node_modules
-├── package.json
-├── package-lock.json 
-└── .gitignore
-
-PSS
-
-&rarr; .idea
-
-&rarr; _pycache_
-
-&rarr; src
-
-    &rarr; __init__.py
-
-    &rarr; protien.py
-
-    &rarr; uniprot_parser.py
-
-&rarr; Dockerfile
-
-&rarr; launch.json
-
-&rarr; main.py
-
-&rarr; requirements.txt
-
-&rarr; test_main.http
-
-&rarr; tests.py
+│   ├── __init__.py \ 
+│   ├── protien.py \
+│   ├── uniprot_parser.py \
+├── .idea \
+├── _pycache_ \
+├──  Dockerfile \
+├── launch.json \
+├── main.py \
+├── requirements.txt \
+├── .idea \
+├── test_main.http \
+└── test.py \

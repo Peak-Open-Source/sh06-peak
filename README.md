@@ -21,7 +21,7 @@ Our file structure consists of a folder containg our PSS microservice this has t
 and requirements.
 
 PSS \
-├── src \\
+├── src \
 │   ├── __init__.py \ 
 │   ├── protien.py \
 │   ├── uniprot_parser.py \

@@ -44,14 +44,11 @@ def parse_uniprot_data(uniprot_dbs: list):
                 case "chains":
                     valid = True
                     coverages = property['value'].split(", ")
-                    largest = 0
-                    for coverage in coverages: # Sometimes we get multiple coverages, so we loop through and pick the largest
+                    for coverage in coverages: # Sometimes we get multiple coverages
                         coverage_range = coverage.split("=")[1].split("-") # Remove formatting to just get the raw numbers
-                        total_coverage = int(coverage_range[1]) - int(coverage_range[0])
-                        if total_coverage > largest:
-                            largest = total_coverage
-
-                    protein_ref.coverage = largest
+                        protein_ref.add_coverage(int(coverage_range[0]), int(coverage_range[1]))
+                    protein_ref.merge_coverages()
+                    protein_ref.coverage = protein_ref.calculate_coverages()
 
         if valid: # Need to check that there was at least 1 valid property existed in the entry
             parsed_proteins.append(protein_ref)   

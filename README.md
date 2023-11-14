@@ -11,6 +11,8 @@ If a query for a protien structure is unsuccesful because it is not found in a k
 
 All workloads of the application must run as containers, originally in Docker however this is expected to be expanded into a kubernetes cluster in the future.
 
+The application should be accessed via REST API or a python script/compiled binary
+
 
 ## useful info - commands
 ## how to guide

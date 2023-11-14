@@ -17,3 +17,18 @@ The application should be accessed via REST API or a python script/compiled bina
 ## useful info - commands
 ## how to guide
 ## file structure
+Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 
+and requirements.
+PSS
+---> .idea
+---> _pycache_
+---> src
+    ---> __init__.py
+    ---> protien.py
+    ---> uniprot_parser.py
+---> Dockerfile
+---> launch.json
+---> main.py
+---> requirements.txt
+---> test_main.http
+---> tests.py

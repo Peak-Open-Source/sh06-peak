@@ -20,7 +20,7 @@ The application should be accessed via REST API or a python script/compiled bina
 Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 
 and requirements.
 PSS
----> .idea
+&rarr; .idea
 ---> _pycache_
 ---> src
     ---> __init__.py

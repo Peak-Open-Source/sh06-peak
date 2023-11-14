@@ -21,14 +21,25 @@ Our file structure consists of a folder containg our PSS microservice this has t
 and requirements.
 PSS
 &rarr; .idea
----> _pycache_
----> src
-    ---> __init__.py
-    ---> protien.py
-    ---> uniprot_parser.py
----> Dockerfile
----> launch.json
----> main.py
----> requirements.txt
----> test_main.http
----> tests.py
+
+&rarr; _pycache_
+
+&rarr; src
+
+    &rarr; __init__.py
+
+    &rarr; protien.py
+
+    &rarr; uniprot_parser.py
+
+&rarr; Dockerfile
+
+&rarr; launch.json
+
+&rarr; main.py
+
+&rarr; requirements.txt
+
+&rarr; test_main.http
+
+&rarr; tests.py

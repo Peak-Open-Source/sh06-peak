@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import src.uniprot_parser as uniprot_parser
+
 import requests
 from fastapi.responses import FileResponse, Response
 import json
@@ -30,9 +31,9 @@ def select_best_structure(structures):
     RES_WEIGHT = 40
 
     for i, score in enumerate(scores):
-        score += (MAX_RES - structures[i].resolution)/MAX_RES * RES_WEIGHT
-        score += method_weights[structures[i].method]
-        score += structures[i].coverage
+        scores[i] += (MAX_RES - float(structures[i]['resolution']))/MAX_RES * RES_WEIGHT
+        scores[i] += method_weights[structures[i]['method']]
+        scores[i] += structures[i]['coverage']
 
     best_score_index = np.argmax(scores)
     best_protein = structures[best_score_index]
@@ -52,7 +53,9 @@ def find_matching_structures(sequence: str):
 def retrieve_by_uniprot_id(uniprot_id):
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     if not 'code' in raw_uniprot_data: # If it didn't throw an error
-        return [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)] # Combine the dictionaries
+        protein_dict =  [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)] # Combine the dictionaries
+        best_structure = select_best_structure(protein_dict)
+        return best_structure
     else:
         return raw_uniprot_data
 

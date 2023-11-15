@@ -1,6 +1,6 @@
 import requests
 import json
-from protein import Protein
+from src.protein import Protein
 
 VALID_DATABASES = ["PDB", "AlphaFoldDB"]
 

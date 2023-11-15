@@ -90,14 +90,13 @@ class clientTests():
         assert "url" in result.json()
         path = f"{os.getcwd()}\{id}"
         assert os.path.exists(path)
-
-        response = self.client.get(result.json()["url"][len("127.0.0.1:8000") + 1:])
+        response = self.client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
         file_content = response.content
         with open(f"{id}.ent", "wb") as f:
             f.write(file_content)
         
         with open(f"{id}.ent", "r") as f:
-            assert len(f.read()) > 20
+            assert len(f.read()) > 50
         os.remove(path + ".ent")
         shutil.rmtree(path)
         assert not os.path.exists(path)

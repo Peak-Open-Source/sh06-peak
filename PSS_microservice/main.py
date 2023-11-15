@@ -51,11 +51,13 @@ def find_matching_structures(sequence: str):
 # Endpoint to retrieve protein structures by Uniprot ID
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
-    raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
-    if not 'code' in raw_uniprot_data: # If it didn't throw an error
-        protein_dict =  [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)] # Combine the dictionaries
+    raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id) 
+    valid_references = raw_uniprot_data[0]
+    sequence = raw_uniprot_data[1]
+    if not 'code' in valid_references: # If it didn't throw an error
+        protein_dict =  [x.as_dict() for x in uniprot_parser.parse_uniprot_data(valid_references)] # Combine the dictionaries
         best_structure = select_best_structure(protein_dict)
-        return best_structure
+        return best_structure, sequence
     else:
         return raw_uniprot_data
 

@@ -15,6 +15,8 @@ The application should be accessed via REST API or a python script/compiled bina
 
 
 ## useful info - commands
+
+run test file through terminal: python -m uvicorn main:app --reload
 ## how to guide
 ## file structure
 Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 

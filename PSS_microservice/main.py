@@ -58,7 +58,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
 
-        return {"status": archive_result.status_code, "url": request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)["_url"]}
+        return {"status": archive_result.status_code, "url": request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url}
     else:
         return {"status": archive_result.status_code, "error": archive_result.reason}
 

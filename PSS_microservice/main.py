@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse, Response
 import json
 import tarfile
 import os
+import numpy as np
 
 app = FastAPI()
 
@@ -19,8 +20,24 @@ def run_check():
 
 # Helper function to select the best structure based on the weightings given by client
 def select_best_structure(structures):
-    # Implement selection logic here
-    return structures[0]
+    if not structures:
+        return None 
+    
+    #assumes lowest resolution is better and xray is the best method 
+    method_weights = {"X-ray": 10, "NMR": 8, "EM": 6, "Other": 1}
+    scores = np.zeros(len(structures))
+    MAX_RES = 10.0
+    RES_WEIGHT = 40
+
+    for i, score in enumerate(scores):
+        score += (MAX_RES - structures[i].resolution)/MAX_RES * RES_WEIGHT
+        score += method_weights[structures[i].method]
+        score += structures[i].coverage
+
+    best_score_index = np.argmax(scores)
+    best_protein = structures[best_score_index]
+
+    return best_protein
 
 
 # Helper function to find matching structures by sequence

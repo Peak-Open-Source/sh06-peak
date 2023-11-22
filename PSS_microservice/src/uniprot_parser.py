@@ -16,11 +16,12 @@ def get_raw_uniprot_data(uniprot_id: str):
         # Load JSON into dict and fetch the database references
         protein_dict = json.loads(result.content)
         references = protein_dict['uniProtKBCrossReferences'] 
+        sequence = protein_dict['sequence']['value']
 
         # Filter references to the databases that we actually want to pull from
         valid_references = [x for x in references if x['database'] in VALID_DATABASES]
 
-        return valid_references
+        return valid_references, sequence
     else:
         return {'code': result.status_code, 'error': result.reason}  # Return error code and reason
 
@@ -44,23 +45,23 @@ def parse_uniprot_data(uniprot_dbs: list):
                 case "chains":
                     valid = True
                     coverages = property['value'].split(", ")
-                    largest = 0
-                    for coverage in coverages: # Sometimes we get multiple coverages, so we loop through and pick the largest
+                    for coverage in coverages: # Sometimes we get multiple coverages
                         coverage_range = coverage.split("=")[1].split("-") # Remove formatting to just get the raw numbers
-                        total_coverage = int(coverage_range[1]) - int(coverage_range[0])
-                        if total_coverage > largest:
-                            largest = total_coverage
-
-                    protein_ref.coverage = largest
+                        protein_ref.add_coverage(int(coverage_range[0]), int(coverage_range[1]))
+                    protein_ref.merge_coverages()
+                    protein_ref.coverage = protein_ref.calculate_coverages()
 
         if valid: # Need to check that there was at least 1 valid property existed in the entry
-            parsed_proteins.append(protein_ref)
+            parsed_proteins.append(protein_ref)   
 
     return parsed_proteins
 
 if __name__ == "__main__":
     TEST_ID = "P05067"
-    reference_list = get_raw_uniprot_data(TEST_ID)
+    uniprot_data = get_raw_uniprot_data(TEST_ID)
+    reference_list = uniprot_data[0] 
+    sequence = uniprot_data[1]
     parsed_proteins = parse_uniprot_data(reference_list)
     for protein in parsed_proteins:
         print("\n", protein)
+    print("\n", sequence)

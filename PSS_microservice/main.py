@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 import src.uniprot_parser as uniprot_parser
+
 import requests
 from fastapi.responses import FileResponse, Response
 import json
 import tarfile
 import os
+import numpy as np
 
 app = FastAPI()
 
@@ -19,8 +21,24 @@ def run_check():
 
 # Helper function to select the best structure based on the weightings given by client
 def select_best_structure(structures):
-    # Implement selection logic here
-    return structures[0]
+    if not structures:
+        return None 
+    
+    #assumes lowest resolution is better and xray is the best method 
+    method_weights = {"X-ray": 10, "NMR": 8, "EM": 6, "Other": 1}
+    scores = np.zeros(len(structures))
+    MAX_RES = 10.0
+    RES_WEIGHT = 40
+
+    for i, score in enumerate(scores):
+        scores[i] += (MAX_RES - float(structures[i]['resolution']))/MAX_RES * RES_WEIGHT
+        scores[i] += method_weights[structures[i]['method']]
+        scores[i] += structures[i]['coverage']
+
+    best_score_index = np.argmax(scores)
+    best_protein = structures[best_score_index]
+
+    return best_protein
 
 
 # Helper function to find matching structures by sequence
@@ -33,9 +51,13 @@ def find_matching_structures(sequence: str):
 # Endpoint to retrieve protein structures by Uniprot ID
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
-    raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
-    if not 'code' in raw_uniprot_data: # If it didn't throw an error
-        return [x.as_dict() for x in uniprot_parser.parse_uniprot_data(raw_uniprot_data)] # Combine the dictionaries
+    raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id) 
+    valid_references = raw_uniprot_data[0]
+    sequence = raw_uniprot_data[1]
+    if not 'code' in valid_references: # If it didn't throw an error
+        protein_dict =  [x.as_dict() for x in uniprot_parser.parse_uniprot_data(valid_references)] # Combine the dictionaries
+        best_structure = select_best_structure(protein_dict)
+        return best_structure, sequence
     else:
         return raw_uniprot_data
 

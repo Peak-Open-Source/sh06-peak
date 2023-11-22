@@ -1,12 +1,13 @@
-from fastapi import FastAPI
-import src.uniprot_parser as uniprot_parser
-
-import requests
-from fastapi.responses import FileResponse, Response
 import json
 import tarfile
 import os
+import requests
 import numpy as np
+
+from fastapi import FastAPI, Request
+from fastapi.responses import FileResponse, Response
+
+import src.uniprot_parser as uniprot_parser
 
 app = FastAPI()
 
@@ -61,14 +62,12 @@ def retrieve_by_uniprot_id(uniprot_id):
     else:
         return raw_uniprot_data
 
-@app.get('/download_pdb_by_id/{pdb_id}')
-def download_pdb_by_id(pdb_id):
+@app.get('/fetch_pdb_by_id/{pdb_id}')
+def fetch_pdb_by_id(request: Request, pdb_id):
     archive_url = f"https://www.ebi.ac.uk/pdbe/download/api/pdb/entry/archive?data_format=pdb&id={pdb_id}"
     archive_result = requests.get(archive_url)
     if archive_result.ok:
         download_url= json.loads(archive_result.content)["url"]
-        print(download_url)
-        filename = f'{pdb_id}.tar.gz'
         response = requests.get(download_url)
         file_content = response.content
         with open ("tmp.tar.gz", 'wb') as tmp:
@@ -76,7 +75,21 @@ def download_pdb_by_id(pdb_id):
         with tarfile.open('tmp.tar.gz', 'r:gz') as tar:
             tar.extractall(f"./{pdb_id}")
         os.remove("tmp.tar.gz")
-        return "slay"
+
+        file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
+
+        return {"status": archive_result.status_code, "url": request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url}
+    else:
+        return {"status": archive_result.status_code, "error": archive_result.reason}
+
+@app.get("/download_pdb/{pdb_id}/{file_name}")
+def download_pdb(pdb_id, file_name):
+    path = f"{os.getcwd()}\{pdb_id}\{file_name}"
+    print(path)
+    if os.path.exists(path) and "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id):
+        return FileResponse(path, media_type='application/octet-stream', filename=file_name)
+    else:
+        return {"status": 404, "error": path}
 
 # Endpoint to retrieve protein structures by sequence
 @app.post('/retrieve_by_sequence')

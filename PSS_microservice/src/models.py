@@ -19,7 +19,7 @@ class ProteinModel(BaseModel):
         }
     
 
-class ProteinCollection(BaseModel):
-    proteins: List[ProteinModel]
+# class ProteinCollection(BaseModel):
+#     proteins: List[ProteinModel]
 
 

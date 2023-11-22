@@ -78,13 +78,21 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
 
-        return {"status": archive_result.status_code, "url": request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url}
+        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+        try:
+            url = url._url
+        except:
+            # Some machines just return url directly
+            pass
+
+        return {"status": archive_result.status_code, "url": url}
     else:
         return {"status": archive_result.status_code, "error": archive_result.reason}
 
+#TODO - Simplify endpoint call to "/download_pdb/{pdb_id}"
 @app.get("/download_pdb/{pdb_id}/{file_name}")
 def download_pdb(pdb_id, file_name):
-    path = f"{os.getcwd()}\{pdb_id}\{file_name}"
+    path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     print(path)
     if os.path.exists(path) and "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id):
         return FileResponse(path, media_type='application/octet-stream', filename=file_name)

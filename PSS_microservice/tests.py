@@ -1,7 +1,16 @@
 import unittest
 import sys
+import requests
 # sys.path.append("..")
 from src.protein import Protein
+from main import app
+import uvicorn
+import os.path
+import shutil
+from os import removedirs
+
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 class proteinTest(unittest.TestCase):
     
@@ -50,5 +59,49 @@ class proteinTest(unittest.TestCase):
         test_protein.merge_coverages()
         self.assertEqual(test_protein.calculate_coverages(), 65)
 
+
+class clientTests():
+
+    def __init__(self):
+        self.client = TestClient(app)
+        self.test_fetch_folder()
+        self.test_fetch_invalid()
+        self.test_url_valid()
+        print("Passed all Client Tests")
+
+    def test_fetch_folder(self):
+        id = "2M9R"
+        result = self.client.get("/fetch_pdb_by_id/" + id)
+        assert "url" in result.json()
+        path = f"{os.getcwd()}\{id}"
+        assert os.path.exists(path)
+        shutil.rmtree(path)
+        assert not os.path.exists(path)
+
+    
+    def test_fetch_invalid(self):
+        id = "bogus"
+        result = self.client.get("/fetch_pdb_by_id/" + id)
+        assert not "url" in result.json()
+
+    def test_url_valid(self):
+        id = "2M9R"
+        result = self.client.get("/fetch_pdb_by_id/" + id)
+        assert "url" in result.json()
+        path = f"{os.getcwd()}\{id}"
+        assert os.path.exists(path)
+        response = self.client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
+        file_content = response.content
+        with open(f"{id}.ent", "wb") as f:
+            f.write(file_content)
+        
+        with open(f"{id}.ent", "r") as f:
+            assert len(f.read()) > 50
+        os.remove(path + ".ent")
+        shutil.rmtree(path)
+        assert not os.path.exists(path)
+
+
 if __name__ == "__main__":
+    clientTests()
     unittest.main()

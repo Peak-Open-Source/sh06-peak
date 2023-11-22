@@ -1,3 +1,23 @@
+import os
+from typing import Optional, List
+
+from fastapi import FastAPI, Body, HTTPException, status
+from fastapi.responses import Response
+from pydantic import ConfigDict, BaseModel, Field, EmailStr
+from pydantic.functional_validators import BeforeValidator
+
+from typing_extensions import Annotated
+
+from bson import ObjectId
+import motor.motor_asyncio
+from pymongo import ReturnDocument
+
+
+app = FastAPI(
+    title="Protein DB",
+    summary="Test our protein structures",
+)
+
 client = motor.motor_asyncio.AsyncIOMotorClient(os.environ["MONGODB_URL"])
 db = client.get_database("ProteinTest")
 protein_collection = db.get_collection("collectionTest")

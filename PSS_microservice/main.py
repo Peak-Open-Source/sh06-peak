@@ -20,25 +20,36 @@ protein_structures = {}
 def run_check():
     return {"message": "running! :)"}
 
+# helper function to score proteins
+def calulate_score(protein):
+    # method weightings provided by client X-ray > NMR ≈ EM > Predicted (ignore other)
+    method_weights = {"X-ray": 4, "NMR": 3, "EM": 2, "Predicted": 1, "Other": 0}
+
+    # methods weightings provided by client Method > % coverage > resolution
+    method_weight = 0.5
+    coverage_weight = 0.3
+    resolution_weight = 0.2
+
+    method_score = method_weights.get(protein.method, 0) # getting the method score, if other then get 0
+    coverage_score = protein.coverage
+    resolution_score = protein.resolution
+
+    # scoring based on formula: a * (method score) + b * (% coverage score) + c * (resolution score)
+    score = (method_weight * method_score) + (coverage_weight * coverage_score) + (resolution_weight * resolution_score)
+    return score
+
+
 # Helper function to select the best structure based on the weightings given by client
 def select_best_structure(structures):
     if not structures:
         return None 
     
-    #assumes lowest resolution is better and xray is the best method 
-    method_weights = {"X-ray": 10, "NMR": 8, "EM": 6, "Other": 1}
-    scores = np.zeros(len(structures))
-    MAX_RES = 10.0
-    RES_WEIGHT = 40
-
-    for i, score in enumerate(scores):
-        scores[i] += (MAX_RES - float(structures[i]['resolution']))/MAX_RES * RES_WEIGHT
-        scores[i] += method_weights[structures[i]['method']]
-        scores[i] += structures[i]['coverage']
-
-    best_score_index = np.argmax(scores)
-    best_protein = structures[best_score_index]
-
+    # calculate the scores for all the proteins 
+    scores = np.array([calulate_score(protein) for protein in structures])
+    # get the best index
+    best_index = np.argmax(scores)
+    best_protein = structures[best_index]
+    # return best protein found
     return best_protein
 
 

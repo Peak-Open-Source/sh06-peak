@@ -11,6 +11,7 @@ from os import removedirs
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+import main
 
 class proteinTest(unittest.TestCase):
     
@@ -100,6 +101,21 @@ class clientTests():
         os.remove(path + ".ent")
         shutil.rmtree(path)
         assert not os.path.exists(path)
+
+class bestStructureTest(unittest.TestCase):
+     def test_select_best_structure(self):
+        # Dummy protiens
+        protein_xray = Protein(id=1, method="X-ray", resolution=2.0, coverage=75)
+        protein_nmr = Protein(id=2, method="NMR", resolution=3.0, coverage=50)
+        protein_em = Protein(id=3, method="EM", resolution=2.5, coverage=60)
+        protein_predicted = Protein(id=4, method="Predicted", resolution=2.0, coverage=70)
+        protein_other = Protein(id=5, method="Other", resolution=3.0, coverage=40)
+
+        structures = [protein_xray, protein_nmr, protein_em, protein_predicted, protein_other]
+
+
+        best_structure = main.select_best_structure(structures)
+        assert(best_structure == protein_xray)
 
 
 if __name__ == "__main__":

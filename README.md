@@ -28,20 +28,17 @@ Endpoints can be accessed at 0.0.0.0:80 or localhost:80
 
 ## How To Guide
 ## Project File Structure
-Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 
-and requirements.
+Our file structure consists of a folder containing our PSS microservice, this includes a main python file, tests, and files to allow Docker integration.
 
-PSS \
-├── src \
-│   ├── __init__.py \ 
-│   ├── protein.py \
-│   ├── uniprot_parser.py \
-├── .idea \
-├── _pycache_ \
-├──  Dockerfile \
-├── launch.json \
-├── main.py \
-├── requirements.txt \
-├── .idea \
-├── test_main.http \
-└── test.py \
+    PSS_microservice
+    ├── src                    # Helper functions and classes
+    │   ├── __init__.py        
+    │   ├── protein.py         # Class for a Protein Structure
+    │   └── uniprot_parser.py  # Fetches and parses Uniprot data
+    ├── Dockerfile             
+    ├── launch.json            #  VSCode Python settings
+    ├── main.py                #  FastAPI Endpoints
+    ├── requirements.txt       
+    ├── test_main.http         #  Basic FastAPI test
+    └── test.py                #  Unit tests
+

@@ -25,7 +25,7 @@ def run_check():
     return {"message": "running! :)"}
 
 # helper function to score proteins
-def calulate_score(protein: Protein):
+def calulate_score(protein: Protein) -> float:
     # method weightings provided by client X-ray > NMR ≈ EM > Predicted (ignore other)
     method_weights = {"X-ray": 4, "NMR": 3, "EM": 2, "Predicted": 1, "Other": 0}
 
@@ -44,7 +44,7 @@ def calulate_score(protein: Protein):
 
 
 # Helper function to select the best structure based on the weightings given by client
-def select_best_structure(structures):
+def select_best_structure(structures: list[Protein]) -> dict:
     if not structures:
         return None 
     

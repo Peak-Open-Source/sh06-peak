@@ -6,8 +6,12 @@ import numpy as np
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, Response
-
-import src.uniprot_parser as uniprot_parser
+try: 
+    from .src import uniprot_parser as uniprot_parser
+    from .src.protein import Protein
+except:
+    import src.uniprot_parser as uniprot_parser
+    from .src.protein import Protein
 
 app = FastAPI()
 
@@ -21,7 +25,7 @@ def run_check():
     return {"message": "running! :)"}
 
 # helper function to score proteins
-def calulate_score(protein):
+def calulate_score(protein: Protein):
     # method weightings provided by client X-ray > NMR ≈ EM > Predicted (ignore other)
     method_weights = {"X-ray": 4, "NMR": 3, "EM": 2, "Predicted": 1, "Other": 0}
 
@@ -30,9 +34,9 @@ def calulate_score(protein):
     coverage_weight = 0.3
     resolution_weight = 0.2
 
-    method_score = method_weights.get(protein['method'], 0) # getting the method score, if other then get 0
-    coverage_score = protein['coverage']
-    resolution_score = protein['resolution']
+    method_score = method_weights.get(protein.method, 0) # getting the method score, if other then get 0
+    coverage_score = protein.coverage
+    resolution_score = protein.resolution
 
     # scoring based on formula: a * (method score) + b * (% coverage score) + c * (resolution score)
     score = (method_weight * method_score) + (coverage_weight * coverage_score) + (resolution_weight * float(resolution_score))
@@ -50,7 +54,7 @@ def select_best_structure(structures):
     best_index = np.argmax(scores)
     best_protein = structures[best_index]
     # return best protein found
-    return best_protein
+    return best_protein.as_dict()
 
 
 # Helper function to find matching structures by sequence
@@ -67,8 +71,8 @@ def retrieve_by_uniprot_id(uniprot_id):
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]
     if not 'code' in valid_references: # If it didn't throw an error
-        protein_dict =  [x.as_dict() for x in uniprot_parser.parse_uniprot_data(valid_references)] # Combine the dictionaries
-        best_structure = select_best_structure(protein_dict)
+        parsed_proteins = uniprot_parser.parse_uniprot_data(valid_references) # Combine the dictionaries
+        best_structure = select_best_structure(parsed_proteins)
         return best_structure, sequence
     else:
         return raw_uniprot_data
@@ -104,7 +108,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 @app.get("/download_pdb/{pdb_id}/{file_name}")
 def download_pdb(pdb_id, file_name):
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
-    print(path)
+    # print(path)
     if os.path.exists(path) and "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id):
         return FileResponse(path, media_type='application/octet-stream', filename=file_name)
     else:

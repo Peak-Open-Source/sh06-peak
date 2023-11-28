@@ -3,7 +3,7 @@ import json
 try:
     from src.protein import Protein
 except:
-    from protein import Protein
+    from .protein import Protein
 
 VALID_DATABASES = ["PDB", "AlphaFoldDB"]
 

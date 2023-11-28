@@ -11,7 +11,7 @@ try:
     from .src.protein import Protein
 except:
     import src.uniprot_parser as uniprot_parser
-    from .src.protein import Protein
+    from src.protein import Protein
 
 app = FastAPI()
 

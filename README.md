@@ -1,7 +1,7 @@
 # SH06 Main
 
 
-## Project overview
+## Project Overview
 SH06 is working with PEAK to develop a protein structure storage application that queries three external databases; AlphaFold, UniProt and EBI to serve protein structure files. 
 
 Real protein structures will be selected from UniProt which will then be used to extract data from the protein data bank (EBI).
@@ -14,11 +14,20 @@ All workloads of the application must run as containers, originally in Docker ho
 The application should be accessed via REST API or a python script/compiled binary
 
 
-## useful info - commands
+## Useful Commands
 
 run test file through terminal: python -m uvicorn main:app --reload
-## how to guide
-## file structure
+
+Rebuild Docker Container:
+
+docker build -t [IMAGE NAME] PSS_microservice/
+
+docker run -p 80:80 [IMAGE NAME]
+
+Endpoints can be accessed at 0.0.0.0:80 or localhost:80
+
+## How To Guide
+## Project File Structure
 Our file structure consists of a folder containg our PSS microservice this has the docker file, our python main file, test files 
 and requirements.
 

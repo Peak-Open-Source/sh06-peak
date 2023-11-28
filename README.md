@@ -16,15 +16,17 @@ The application should be accessed via REST API or a python script/compiled bina
 
 ## Useful Commands
 
-run test file through terminal: python -m uvicorn main:app --reload
+**run test file through terminal:** python -m uvicorn main:app --reload
 
-Rebuild Docker Container:
+**Rebuild Docker Container:**
 
 docker build -t [IMAGE NAME] PSS_microservice/
 
 docker run -p 80:80 [IMAGE NAME]
 
 Endpoints can be accessed at 0.0.0.0:80 or localhost:80
+
+**Run test files:** pytest
 
 ## How To Guide
 ## Project File Structure

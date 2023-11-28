@@ -30,12 +30,12 @@ def calulate_score(protein):
     coverage_weight = 0.3
     resolution_weight = 0.2
 
-    method_score = method_weights.get(protein.method, 0) # getting the method score, if other then get 0
-    coverage_score = protein.coverage
-    resolution_score = protein.resolution
+    method_score = method_weights.get(protein['method'], 0) # getting the method score, if other then get 0
+    coverage_score = protein['coverage']
+    resolution_score = protein['resolution']
 
     # scoring based on formula: a * (method score) + b * (% coverage score) + c * (resolution score)
-    score = (method_weight * method_score) + (coverage_weight * coverage_score) + (resolution_weight * resolution_score)
+    score = (method_weight * method_score) + (coverage_weight * coverage_score) + (resolution_weight * float(resolution_score))
     return score
 
 

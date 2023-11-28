@@ -1,6 +1,9 @@
 import requests
 import json
-from src.protein import Protein
+try:
+    from src.protein import Protein
+except:
+    from protein import Protein
 
 VALID_DATABASES = ["PDB", "AlphaFoldDB"]
 

@@ -50,6 +50,7 @@ def find_matching_structures(sequence: str):
     return matches
 
 
+
 # Endpoint to retrieve protein structures by Uniprot ID
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
@@ -80,6 +81,12 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
 
         return {"status": archive_result.status_code, "url": request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url}
+    
+#below - what to be passed to models for the db
+        sequence = pdb_sequences[pdb_id]
+        path = os.getcwd() + "/" + pdb_id + "/" + file
+        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
+
     else:
         return {"status": archive_result.status_code, "error": archive_result.reason}
 

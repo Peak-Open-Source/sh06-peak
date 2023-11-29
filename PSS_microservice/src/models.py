@@ -1,8 +1,5 @@
-import uuid
-from typing import Optional
-from pydantic import BaseModel, Field
 from mongoengine import *
-connect('peak project') # come back to this
+# connect('peak project', host= 'localhost' port=27017) # come back to this
 
 # class User(Document):
 #     email = StringField(required=True)
@@ -17,7 +14,8 @@ class Protein(Document):
         self.sequence=s, self.pdb_name=pdb, self.url=url
     meta={'collection': 'protein_collection'}
 
-
+s1=Protein('sequence', 'pdb', 'url')
+s1.save()
 # class ProteinModel(BaseModel):
 #     id: str = Field(default_factory=uuid.uuid4, alias="_id")
 #     sequence: str = Field(...) #get from fetch_pdb_by_id

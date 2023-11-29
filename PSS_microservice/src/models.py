@@ -1,3 +1,4 @@
+import pymongo
 from mongoengine import *
 # connect('peak project', host= 'localhost' port=27017) # come back to this
 
@@ -6,6 +7,9 @@ from mongoengine import *
 #     first_name = StringField(max_length=60)
 #     surname = StringField(max_length=69)
 
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["ProteinTest"]
+mycol = mydb["collectionTest"]
 class Protein(Document):
     sequence = StringField() 
     pdb_name = StringField()

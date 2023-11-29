@@ -45,7 +45,7 @@ def calulate_score(protein: Protein) -> float:
 
 # Helper function to select the best structure based on the weightings given by client
 def select_best_structure(structures: list[Protein]) -> dict:
-    if not structures:
+    if not structures or len(structures) == 0:
         return None 
     
     # calculate the scores for all the proteins 
@@ -63,7 +63,7 @@ def find_matching_structures(sequence: str):
     matches = [structure for structure in protein_structures.values() if structure['sequence'] == sequence]
     return matches
 
-
+pdb_sequences = {}
 # Endpoint to retrieve protein structures by Uniprot ID
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id):
@@ -73,9 +73,12 @@ def retrieve_by_uniprot_id(uniprot_id):
     if not 'code' in valid_references: # If it didn't throw an error
         parsed_proteins = uniprot_parser.parse_uniprot_data(valid_references) # Combine the dictionaries
         best_structure = select_best_structure(parsed_proteins)
+        if best_structure == None:
+            return {"error": "No valid structure found"}
+        pdb_sequences[best_structure["id"]] = sequence
         return best_structure, sequence
     else:
-        return raw_uniprot_data
+        return {"error":"Failed to resolve valid references", "data":raw_uniprot_data}
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
 def fetch_pdb_by_id(request: Request, pdb_id):
@@ -93,7 +96,11 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
 
+        #below - what to be passed to models for the db
+        sequence = pdb_sequences[pdb_id]
+        path = os.getcwd() + "/" + pdb_id + "/" + file
         url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+
         try:
             url = url._url
         except:

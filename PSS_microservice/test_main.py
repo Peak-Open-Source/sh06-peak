@@ -63,10 +63,12 @@ class TestProtein():
 
 class TestClient():
     def test_fetch_folder(self):
-        id = "2M9R"
-        result = client.get("/fetch_pdb_by_id/" + id)
+        protein_id = "P05067"
+        structure_id = "5BUO"
+        client.get("/retrieve_by_uniprot_id/" + protein_id)
+        result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}/{id}"
+        path = f"{os.getcwd()}/{structure_id}"
         assert os.path.exists(path)
         shutil.rmtree(path)
         assert not os.path.exists(path)
@@ -78,17 +80,19 @@ class TestClient():
         assert not "url" in result.json()
 
     def test_url_valid(self):
-        id = "2M9R"
-        result = client.get("/fetch_pdb_by_id/" + id)
+        protein_id = "P05067"
+        structure_id = "5BUO"
+        client.get("/retrieve_by_uniprot_id/" + protein_id)
+        result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}/{id}"
+        path = f"{os.getcwd()}/{structure_id}"
         assert os.path.exists(path)
         response = client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
         file_content = response.content
-        with open(f"{id}.ent", "wb") as f:
+        with open(f"{structure_id}.ent", "wb") as f:
             f.write(file_content)
         
-        with open(f"{id}.ent", "r") as f:
+        with open(f"{structure_id}.ent", "r") as f:
             assert len(f.read()) > 50
         os.remove(path + ".ent")
         shutil.rmtree(path)

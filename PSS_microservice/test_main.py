@@ -64,8 +64,7 @@ class TestProtein():
 class TestClient():
     def test_fetch_folder(self):
         protein_id = "P05067"
-        structure_id = "5BUO"
-        client.get("/retrieve_by_uniprot_id/" + protein_id)
+        structure_id = client.get("/retrieve_by_uniprot_id/" + protein_id).json()["structure"]["id"]
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
         path = f"{os.getcwd()}/{structure_id}"
@@ -81,8 +80,7 @@ class TestClient():
 
     def test_url_valid(self):
         protein_id = "P05067"
-        structure_id = "5BUO"
-        client.get("/retrieve_by_uniprot_id/" + protein_id)
+        structure_id = client.get("/retrieve_by_uniprot_id/" + protein_id).json()["structure"]["id"]
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
         path = f"{os.getcwd()}/{structure_id}"

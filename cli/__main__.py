@@ -35,7 +35,7 @@ def get_best_uniprot(id: str):
     elif "error" in best_uniprot:
         print("No valid PDBs found")
         return
-    pdb_id = best_uniprot[0]["id"]
+    pdb_id = best_uniprot["structure"]["id"]
     fetch_result, success = client.get("fetch_pdb_by_id", [pdb_id])
     if not success or "error" in fetch_result: 
         print("PDB Fetch failure")
@@ -86,4 +86,7 @@ def get_command():
 
 
 if __name__ == "__main__":
-    get_command()
+    if len(sys.argv) < 2:
+        help()
+    else:
+        get_command()

@@ -76,7 +76,7 @@ def retrieve_by_uniprot_id(uniprot_id):
         if best_structure == None:
             return {"error": "No valid structure found"}
         pdb_sequences[best_structure["id"]] = sequence
-        return best_structure, sequence
+        return {'structure': best_structure, 'sequence': sequence}
     else:
         return {"error":"Failed to resolve valid references", "data":raw_uniprot_data}
 
@@ -97,7 +97,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id) if f != "contains.txt"][0]
 
         #below - what to be passed to models for the db
-        sequence = pdb_sequences[pdb_id]
+        # sequence = pdb_sequences[pdb_id]
         path = os.getcwd() + "/" + pdb_id + "/" + file
         url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
 

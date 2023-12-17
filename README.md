@@ -26,7 +26,9 @@ docker run -p 80:80 [IMAGE NAME]
 
 Endpoints can be accessed at 0.0.0.0:80 or localhost:80
 
-**Run test files:** pytest
+**Testing:** 
+
+pytest --cov-report term-missing --cov=PSS_microservice
 
 ## How To Guide
 ## Project File Structure

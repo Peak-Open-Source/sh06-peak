@@ -1,20 +1,15 @@
 stages:
+  - build
   - test
 
-variables:
-  DOCKER_IMAGE: python:3.11.5-slim
-
-before_script:
-  - docker pull $DOCKER_IMAGE
+build:
+  stage: build
+  script:
+    - pip install -r requirements.txt
 
 test:
   stage: test
+  before_script:
+    - setup_test_environment_script.sh
   script:
-    - docker run --rm -v $(pwd):/app -w /app $DOCKER_IMAGE pip install -r requirements.txt
-    - docker run --rm -v $(pwd):/app -w /app $DOCKER_IMAGE pytest PSS_microservice/tests.py
-
-  only:
-    - branches  # Run on all branches
-
-  except:
-    - master  # Exclude the master branch from testing
+    - pytest PSS_microservice/tests.py

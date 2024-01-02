@@ -1,0 +1,29 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE_PREFIX: registry.gitlab.com
+
+before_script:
+  - pip install docker-compose
+
+build:
+  stage: build
+  script:
+    - docker build -t $DOCKER_IMAGE_PREFIX/$CI_COMMIT_REF_SLUG/pss-microservice .
+    - docker push $DOCKER_IMAGE_PREFIX/$CI_COMMIT_REF_SLUG/pss-microservice
+
+test:
+  stage: test
+  script:
+    - docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - echo "Deploying"
+    

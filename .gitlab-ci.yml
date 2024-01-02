@@ -1,28 +1,20 @@
 stages:
   - test
 
-before_script:
-  - apt-get install -y python3.11.5
-  - update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11.5
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - pip install -r requirements.txt
-
 variables:
-  PYTHON_VERSION: "3.11.5"
+  DOCKER_IMAGE: python:3.11.5-slim
 
 before_script:
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - pip install -r requirements.txt
+  - docker pull $DOCKER_IMAGE
 
 test:
   stage: test
   script:
-    - pytest PSS_microservice/tests.py
+    - docker run --rm -v $(pwd):/app -w /app $DOCKER_IMAGE pip install -r requirements.txt
+    - docker run --rm -v $(pwd):/app -w /app $DOCKER_IMAGE pytest PSS_microservice/tests.py
 
   only:
-    - branches  
+    - branches  # Run on all branches
 
   except:
-    - master 
+    - master  # Exclude the master branch from testing

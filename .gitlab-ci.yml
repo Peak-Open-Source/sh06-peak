@@ -21,7 +21,7 @@ before_script:
 test:
   stage: test
   script:
-    - unittest PSS_microservice/tests.py
+    - python3 PSS_microservice/tests.py
 
   only:
     - branches  

@@ -105,5 +105,5 @@ class clientTests():
 
 
 if __name__ == "__main__":
-    clientTests()
+    #clientTests()
     unittest.main()

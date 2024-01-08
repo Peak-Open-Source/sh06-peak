@@ -7,6 +7,7 @@ import numpy as np
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, Response
+from PSS_microservice.src import models
 
 import src.uniprot_parser as uniprot_parser
 
@@ -86,6 +87,8 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         sequence = pdb_sequences[pdb_id]
         path = os.getcwd() + "/" + pdb_id + "/" + file
         url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
+        
+        write_to_database(sequence, path, url)
 
     else:
         return {"status": archive_result.status_code, "error": archive_result.reason}

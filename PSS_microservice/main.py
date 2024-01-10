@@ -131,12 +131,17 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
     
 #below - what to be passed to models for the db
-        if pdb_id in sequence:
+        if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]
             path = os.getcwd() + "/" + pdb_id + "/" + file
             url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
             
             models.write_to_database(sequence, path, url)
+
+            #testing the find function; works
+            prot = models.find("ramen")
+            print("aaaaaaaaa")
+            print(prot)
 
         
         return {"status": archive_result.status_code,
@@ -171,6 +176,7 @@ def retrieve_by_sequence(sequence: str):
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
+    #find(key, field = key)
     return
 
 

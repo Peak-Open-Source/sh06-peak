@@ -37,6 +37,7 @@ def parse_uniprot_data(uniprot_dbs: list):
     for db_reference in uniprot_dbs:
         # Create Protein object from each entry's ID
         protein_ref = Protein(db_reference['id'])
+        protein_ref.is_alphafold = db_reference["database"] == "AlphaFoldDB"
         valid = False
         for property in db_reference['properties']:
             # Handle corresponding property from each entry

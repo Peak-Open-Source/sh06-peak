@@ -138,7 +138,6 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 @app.get("/download_pdb/{pdb_id}/{file_name}")
 def download_pdb(pdb_id, file_name):
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
-    # print(path)
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):
         return FileResponse(path, media_type='application/octet-stream',

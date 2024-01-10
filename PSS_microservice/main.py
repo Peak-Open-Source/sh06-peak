@@ -14,6 +14,8 @@ except ImportError:
     import src.uniprot_parser as uniprot_parser
     from src.protein import Protein
 
+ALPHAFOLD_PENALTY = .1
+
 app = FastAPI()
 
 # This should be a from our database of stored structures
@@ -48,6 +50,10 @@ def calulate_score(protein: Protein) -> float:
     score = ((method_weight * method_score) +
              (coverage_weight * coverage_score) +
              (resolution_weight * float(resolution_score)))
+    
+    if protein.is_alphafold:
+        score -= ALPHAFOLD_PENALTY
+    
     return score
 
 

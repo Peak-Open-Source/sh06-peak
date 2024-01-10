@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import traceback
 
 # MongoDB connection URI
 uri = 'mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority'
@@ -31,12 +32,47 @@ def write_to_database(seq, path, url):
 
     except Exception as e:
         print(f"An error occurred: {e}")
+        print(traceback.format_exc())  # Print detailed traceback
+        return None
 
     finally:
         # Close the connection
         client.close()
 
 # Call the function to perform database operations
-#write_to_database()
+
+##sequence or key or pdb id
+
+# def find(to_find):
+
+#     try:
+#         client = MongoClient(uri)
+#         database = client['ProteinDatabase']
+#         collection = database['ProteinCollection']
+
+#         protein_info = {"Sequence":to_find}
+#         protein = collection.find(protein_info)
+
+#         return protein
+
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+
+#     finally:
+#         # Close the connection
+
+#         client.close()
+
+# protein_to_find = find("ramen")
+# print(protein_to_find)
+
+
+
+
+
+
+
+
+#TO CONNECT - in mongoDB compass at connect paste in uri at top of file :)
 
 

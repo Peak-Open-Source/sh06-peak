@@ -2,7 +2,7 @@ import sys
 
 from PSSClient import PSSClient
 
-client = PSSClient("http://0.0.0.0", 80)
+client = PSSClient("http://127.0.0.1", 8000)
 
 
 class Command():

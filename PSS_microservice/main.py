@@ -7,7 +7,7 @@ import numpy as np
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, Response
-from PSS_microservice.src import models
+import src.models as models
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -92,6 +92,7 @@ def retrieve_by_uniprot_id(uniprot_id):
         if best_structure is None:
             return {"error": "No valid structure found"}
         pdb_sequences[best_structure["id"]] = sequence
+        print(pdb_sequences)
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -130,11 +131,12 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
     
 #below - what to be passed to models for the db
-        sequence = pdb_sequences[pdb_id]
-        path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
-        
-        write_to_database(sequence, path, url)
+        if pdb_id in sequence:
+            sequence = pdb_sequences[pdb_id]
+            path = os.getcwd() + "/" + pdb_id + "/" + file
+            url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
+            
+            models.write_to_database(sequence, path, url)
 
         
         return {"status": archive_result.status_code,

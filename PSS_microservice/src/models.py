@@ -43,14 +43,14 @@ def write_to_database(seq, path, url):
 
 ##sequence or key or pdb id
 
-# def find(to_find):
+# def find(to_find, field):
 
 #     try:
 #         client = MongoClient(uri)
 #         database = client['ProteinDatabase']
 #         collection = database['ProteinCollection']
 
-#         protein_info = {"Sequence":to_find}
+#         protein_info = {field:to_find}
 #         protein = collection.find(protein_info)
 
 #         return protein

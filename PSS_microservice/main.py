@@ -4,8 +4,10 @@ import os
 import requests
 import numpy as np
 
+
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from PSS_microservice.src import models
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -114,7 +116,6 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id)
                 if f != "contains.txt"][0]
-
         # below - what to be passed to models for the db
         # sequence = pdb_sequences[pdb_id]
 
@@ -127,8 +128,18 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             # Some machines just return url directly
             pass
 
+    
+#below - what to be passed to models for the db
+        sequence = pdb_sequences[pdb_id]
+        path = os.getcwd() + "/" + pdb_id + "/" + file
+        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)._url
+        
+        write_to_database(sequence, path, url)
+
+        
         return {"status": archive_result.status_code,
                 "url": url}
+
     else:
         return {"status": archive_result.status_code,
                 "error": archive_result.reason}

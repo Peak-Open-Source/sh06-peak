@@ -43,25 +43,25 @@ def write_to_database(seq, path, url):
 
 ##sequence or key or pdb id
 
-# def find(to_find, field):
+def find(to_find):
 
-#     try:
-#         client = MongoClient(uri)
-#         database = client['ProteinDatabase']
-#         collection = database['ProteinCollection']
+    try:
+        client = MongoClient(uri)
+        database = client['ProteinDatabase']
+        collection = database['ProteinCollection']
 
-#         protein_info = {field:to_find}
-#         protein = collection.find(protein_info)
+        protein_info = {"Sequence":to_find}
+        protein = collection.find(protein_info)
 
-#         return protein
+        return protein
 
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-#     finally:
-#         # Close the connection
+    finally:
+        # Close the connection
 
-#         client.close()
+        client.close()
 
 # protein_to_find = find("ramen")
 # print(protein_to_find)

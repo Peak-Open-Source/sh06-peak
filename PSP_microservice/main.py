@@ -20,7 +20,7 @@ def run_check():
 # Endpoint to search predictions already stored in alpha 
 @app.get('/prediction/{qualifier}')
 def get_prediction(qualifier):
-    url = f"https://alphafold.ebi.ac.uk/api/uniprot/summary/{qualifier}.json"
+    url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
     result = requests.get(url)  # Fetch corresponding JSON from alphafold API
     if result.ok:
         alphafold_dict = json.loads(result.content) #loads in the raw json data
@@ -34,7 +34,7 @@ def get_prediction(qualifier):
     if result.ok:
         alphafold_dict = json.loads(result.content)
         model_url = alphafold_dict["structures"][0]["summary"]["model_page_url"] #parses the raw data to find the model page
-    return RedirectResponse(url=model_url) #redirects user to the model page
+    return RedirectResponse(url=model_url) #redirects user to the model
 
 
 if __name__ == '__main__':

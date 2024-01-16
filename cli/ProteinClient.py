@@ -2,7 +2,11 @@ import sys
 
 from PSSClient import PSSClient
 
-client = PSSClient("http://127.0.0.1", 8000)
+ip = input("Please enter the IP of the PSS Microservice, for example http://localhost (not the port!): ")
+port = input("Please enter the corresponding port for the PSS Microservice: ")
+while not port.isnumeric():
+    port = input("Please enter the corresponding port for the PSS Microservice: ")
+client = PSSClient(ip, int(port))
 running = True
 
 class Command():
@@ -100,11 +104,13 @@ def get_command(command_args):
             command.method(*command_args[1:])
 
 
-if __name__ == "__main__":
-    while running:
-        print("Enter command (use \"help\" for help):")
-        command = input().split()
-        if len(command) < 1:
-            help()
-        else:
+while running:
+    print("Enter command (use \"help\" for help):")
+    command = input().split()
+    if len(command) < 1:
+        help()
+    else:
+        try:
             get_command(command)
+        except:
+            print("An error occurred executing the command!\nMake sure your IP/Port and command are valid, and that the Microservice is online.")

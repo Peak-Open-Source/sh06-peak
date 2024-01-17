@@ -42,6 +42,7 @@ class Protein:
         self._resolution = resolution
         self._coverage = coverage
         self._coverage_list = []
+        self._is_alphafold = False
 
     def as_dict(self) -> dict:
         # Return all instance information into an effective
@@ -104,6 +105,14 @@ class Protein:
     @property
     def method(self):
         return self._method
+    
+    @property
+    def is_alphafold(self):
+        return self._is_alphafold
+    
+    @method.setter
+    def is_alphafold(self, val: bool):
+        self._is_alphafold = val
 
     @method.setter
     def method(self, val):

@@ -15,7 +15,10 @@ def write_to_database(seq, path, url):
         collection = database['ProteinCollection']
 
         #Function is called in PSS_microservice/main.py - fetch_pdb_by_id
-#need to figure out _id deal; object? hten add to retrieve
+#_id = ObjectID; just the id of each one, new compass version search by {_id: ObjectID('idnumber')} 
+        #old version (ours i think) {"_id":{"$oid":"object_id"}}
+        #if already exists: update ; TO BE IMPLEMENTED
+
         document = {
             'Sequence': seq,
             'PDB': path,
@@ -54,6 +57,8 @@ def find(to_find, field):
             protein_info = {"Sequence":to_find}
         elif (field == "PDB"):
             protein_info = {"PDB":to_find} 
+        elif (field == "Key"):
+            protein_info = {"_id":{"$oid":to_find}}
 
         protein = collection.find(protein_info)
         return protein

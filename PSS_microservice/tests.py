@@ -75,7 +75,7 @@ class clientTests():
         id = "2M9R"
         result = self.client.get("/fetch_pdb_by_id/" + id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}\{id}"
+        path = os.getcwd() + "/" + id
         assert os.path.exists(path)
         shutil.rmtree(path)
         assert not os.path.exists(path)
@@ -90,14 +90,14 @@ class clientTests():
         id = "2M9R"
         result = self.client.get("/fetch_pdb_by_id/" + id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}\{id}"
+        path = os.getcwd() + "/" + id
         assert os.path.exists(path)
         response = self.client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
         file_content = response.content
-        with open(f"{id}.ent", "wb") as f:
+        with open(id + ".ent", "wb") as f:
             f.write(file_content)
         
-        with open(f"{id}.ent", "r") as f:
+        with open(id + ".ent", "r") as f:
             assert len(f.read()) > 50
         os.remove(path + ".ent")
         shutil.rmtree(path)

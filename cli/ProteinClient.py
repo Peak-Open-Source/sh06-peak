@@ -2,8 +2,12 @@ import sys
 
 from PSSClient import PSSClient
 
-client = PSSClient("http://127.0.0.1", 8000)
-
+ip = input("Please enter the IP of the PSS Microservice, for example http://localhost (not the port!): ")
+port = input("Please enter the corresponding port for the PSS Microservice: ")
+while not port.isnumeric():
+    port = input("Please enter the corresponding port for the PSS Microservice: ")
+client = PSSClient(ip, int(port))
+running = True
 
 class Command():
     def __init__(self, name: str, description: str, func, num_args: int = 0):
@@ -64,6 +68,9 @@ def help():
         command.print()
         print("-")
 
+def exit():
+    global running
+    running = False
 
 COMMANDS = {
     "help": Command(
@@ -74,25 +81,36 @@ COMMANDS = {
     "get": Command(
         "get",
         "Usage \
-            \"get [database_type] [id]\
+            \"get [database_type] [id]\"\
             \"\nFetches and downloads best PDB from appropriate database.\
             \nExample Usage: get uniprot P12319",
         get,
         2
     ),
+    "exit": Command(
+        "exit",
+        "Usage \
+            \nExits the program",
+        exit,
+    ),
 }
 
 
-def get_command():
-    target = sys.argv[1]
+def get_command(command_args):
+    target = command_args[0]
     if target in COMMANDS:
         command = COMMANDS[target]
-        if command.number_of_args == len(sys.argv) - 2:
-            command.method(*sys.argv[2:])
+        if command.number_of_args == len(command_args) - 1:
+            command.method(*command_args[1:])
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
+while running:
+    print("Enter command (use \"help\" for help):")
+    command = input().split()
+    if len(command) < 1:
         help()
     else:
-        get_command()
+        try:
+            get_command(command)
+        except:
+            print("An error occurred executing the command!\nMake sure your IP/Port and command are valid, and that the Microservice is online.")

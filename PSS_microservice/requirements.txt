@@ -4,3 +4,8 @@ requests
 httpx
 numpy
 aiofiles
+pydantic
+pymongo[srv]
+python-dotenv==0.19.2
+pytest==7.0.1
+mongoengine

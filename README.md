@@ -20,7 +20,7 @@ The application should be accessed via REST API or a python script/compiled bina
 
 **Rebuild Docker Container:**
 
-docker build -t [IMAGE NAME] PSS_microservice/
+docker build -t [IMAGE NAME] .
 
 docker run -p 80:80 [IMAGE NAME]
 

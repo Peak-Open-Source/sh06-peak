@@ -1,8 +1,7 @@
 
 stages:
-  - lint
   - test
-  - image
+  - build
 
 variables:
   PYTHON_VERSION: "3.11.7"
@@ -29,11 +28,11 @@ run_tests:
     - master 
 
 build_image:
-  stage: image
+  stage: build
 
-  image: docker:25.0.0
+  image: docker:24
   services:
-    - docker:25.0.0-dind
+    - docker:24-dind
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   

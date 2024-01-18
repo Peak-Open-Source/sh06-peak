@@ -76,17 +76,28 @@ line 6: run mongo in the container
 line 7: show dbs (will show all databases inside directory)
 
 ## Project File Structure
-Our file structure consists of a folder containing our PSS microservice, this includes a main python file, tests, and files to allow Docker integration.
 
-    PSS_microservice
-    ├── src                    # Helper functions and classes
-    │   ├── __init__.py        
-    │   ├── protein.py         # Class for a Protein Structure
-    │   └── uniprot_parser.py  # Fetches and parses Uniprot data
-    ├── Dockerfile             
-    ├── launch.json            #  VSCode Python settings
-    ├── main.py                #  FastAPI Endpoints
-    ├── requirements.txt       
-    ├── test_main.http         #  Basic FastAPI test
-    └── test.py                #  Unit tests
+
+    ├── cli                         # CLI source code
+    │   ├── ProteinClient.py
+    │   └── PSSClient.py
+    ├── PSP_microservice            # PSP source code
+    │   ├── alphafold_parser.py
+    │   └── main.py
+    ├── PSS_microservice            # PSS source code
+    │   ├── src                     # Helper functions and classes
+    │   │   ├── __init__.py   
+    │   │   ├── models.py   
+    │   │   ├── protein.py          # Class for a Protein Structure
+    │   │   └── uniprot_parser.py   # Fetches and parses Uniprot data
+    │   ├── __init__.py   
+    │   └── main.py                 # API Endpoints
+    ├── tests
+    │   ├── api_requests.http       #  Test API Endpoints
+    │   └── test_main.py            #  Unit tests
+    ├── .gitignore          
+    ├── .gitlab-ci.yml   
+    ├── Dockerfile   
+    ├── README.md
+    └── requirements.txt    
 

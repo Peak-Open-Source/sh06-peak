@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
-from .src.protein import Protein
-from .main import app
-from .main import select_best_structure
+
+from context import Protein
+from context import app
+from context import select_best_structure
 
 import os.path
 import shutil

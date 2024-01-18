@@ -6,8 +6,12 @@ Handles fetching and and parsing the protien data from alphafold
 """
 
 
-def get_raw_alphafold_data(qualifier: str):
-    url = f"/uniprot/summary/{qualifier}.json"
+def get_alphafold_sequence(qualifier: str):
+    url = f"https://alphafold.ebi.ac.uk/api/uniprot/summary/{qualifier}.json"
     result = requests.get(url)  # Fetch corresponding JSON from alphafold API
-    return #TODO parse data to return sequence
+    if result.ok:
+        alphafold_dict = json.loads(result.content) 
+    return # TODO parse data to get sequence
+
+
 

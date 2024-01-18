@@ -24,21 +24,21 @@ run_tests:
   except:
     - master 
 
-build_image:
-  stage: build
+# build_image:
+#   stage: build
 
-  image: docker:24
-  services:
-    - docker:24-dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
-    HARBOR_USER: sh06
-    IMAGE_NAME: harbor.peak.scot/sh06/pss_microservice
-    IMAGE_TAG: latest
+#   image: docker:24
+#   services:
+#     - docker:24-dind
+#   variables:
+#     DOCKER_TLS_CERTDIR: "/certs"
+#     HARBOR_USER: sh06
+#     IMAGE_NAME: harbor.peak.scot/sh06/pss_microservice
+#     IMAGE_TAG: latest
   
-  before_script:
-    - docker login -u $HARBOR_USER -p $HARBOR_PASSWORD harbor.peak.scot
+#   before_script:
+#     - docker login -u $HARBOR_USER -p $HARBOR_PASSWORD harbor.peak.scot
   
-  script:
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
-    - docker push $IMAGE_NAME:$IMAGE_TAG
+#   script:
+#     - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+#     - docker push $IMAGE_NAME:$IMAGE_TAG

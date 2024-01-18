@@ -7,9 +7,7 @@ stages:
   - push_image
 
 before_script:
-  - apt-get install -y python3.11.7
-  - update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11.7
-  - python3 -m venv venv
+  - python -m venv venv
   - source venv/bin/activate
   - pip install -r PSS_microservice/requirements.txt
 
@@ -19,7 +17,7 @@ variables:
 run_tests:
   stage: test
   script:
-    - python3 pytest
+    - pytest
 
   only:
     - branches  

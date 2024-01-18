@@ -1,27 +1,24 @@
-image: python:latest
+image: python:3.11.7
 
 stages:
+  - lint
   - test
+  - build_image
+  - push_image
 
 before_script:
-  - apt-get install -y python3.11.5
-  - update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11.5
+  - update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11.7
   - python3 -m venv venv
   - source venv/bin/activate
   - pip install -r PSS_microservice/requirements.txt
 
 variables:
-  PYTHON_VERSION: "3.11.5"
+  PYTHON_VERSION: "3.11.7"
 
-before_script:
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - pip install -r PSS_microservice/requirements.txt
-
-test:
+run_tests:
   stage: test
   script:
-    - python3 PSS_microservice/tests.py
+    - python3 pytest
 
   only:
     - branches  

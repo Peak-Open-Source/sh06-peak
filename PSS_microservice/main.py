@@ -4,8 +4,10 @@ import os
 import requests
 import numpy as np
 
+
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+import src.models as models
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -96,6 +98,7 @@ def retrieve_by_uniprot_id(uniprot_id):
         if best_structure is None:
             return {"error": "No valid structure found"}
         pdb_sequences[best_structure["id"]] = sequence
+        print(pdb_sequences)
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -120,7 +123,6 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
         file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id)
                 if f != "contains.txt"][0]
-
         # below - what to be passed to models for the db
         # sequence = pdb_sequences[pdb_id]
 
@@ -133,8 +135,30 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             # Some machines just return url directly
             pass
 
+    
+#below - what to be passed to models for the db
+        if pdb_id in pdb_sequences:
+            sequence = pdb_sequences[pdb_id]
+            path = os.getcwd() + "/" + pdb_id + "/" + file
+            request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+            try:
+                url = url._url
+            except AttributeError:
+                pass
+
+            # TODO - get database links working on pipeline
+            
+            # models.write_to_database(sequence, path, url)
+
+            #testing the find function; works
+            # prot = models.find("ramen")
+            # print("aaaaaaaaa")
+            # print(prot)
+
+        
         return {"status": archive_result.status_code,
                 "url": url}
+
     else:
         return {"status": archive_result.status_code,
                 "error": archive_result.reason}
@@ -163,6 +187,7 @@ def retrieve_by_sequence(sequence: str):
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
+    #find(key, field = key)
     return
 
 

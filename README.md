@@ -20,7 +20,7 @@ The application should be accessed via REST API or a python script/compiled bina
 
 **Rebuild Docker Container:**
 
-docker build -t [IMAGE NAME] PSS_microservice/
+docker build -t [IMAGE NAME] .
 
 docker run -p 80:80 [IMAGE NAME]
 
@@ -31,18 +31,73 @@ Endpoints can be accessed at 0.0.0.0:80 or localhost:80
 pytest --cov-report term-missing --cov=PSS_microservice
 
 ## How To Guide
-## Project File Structure
-Our file structure consists of a folder containing our PSS microservice, this includes a main python file, tests, and files to allow Docker integration.
 
-    PSS_microservice
-    ├── src                    # Helper functions and classes
-    │   ├── __init__.py        
-    │   ├── protein.py         # Class for a Protein Structure
-    │   └── uniprot_parser.py  # Fetches and parses Uniprot data
-    ├── Dockerfile             
-    ├── launch.json            #  VSCode Python settings
-    ├── main.py                #  FastAPI Endpoints
-    ├── requirements.txt       
-    ├── test_main.http         #  Basic FastAPI test
-    └── test.py                #  Unit tests
+### MongoDB to Docker
+
+To run the MongoDB file in Docker and store it in Docker, run the following commands:
+
+line 1: docker run -t mongo 
+
+line 2: docker images (just to check if mongo image is stored)
+
+line 3: docker run mongodb 
+
+line 4: docker ps (checks if the mongo is running in the container - should come up with information of container)
+
+line 5: docker exec -it (containerID) (full directory of files from which we afer running the docker container (e.g /data/db))
+
+After these, the terminal should take us into a test directory and by running the following command:
+
+line 6: show collections 
+
+shows all the JSON information we have.
+
+OR:
+
+line 1: docker run -t mongo
+
+line 2: docker pull mongo:latest
+
+line 3: docker run mongo
+
+line 4: make new directory (mkdir (newDirectory)
+
+Inside the new directory
+
+docker run -d -p 2717:27017 -v ~/data/db --name (mymongo) mongo
+
+check if container is made by running (docker ps - should output a container ID)
+
+line 5: winpty docker exec -it mymongo bash (should take us inside container.
+
+line 6: run mongo in the container
+(Should take us into a local directory called test)
+
+line 7: show dbs (will show all databases inside directory)
+
+## Project File Structure
+
+
+    ├── cli                         # CLI source code
+    │   ├── ProteinClient.py
+    │   └── PSSClient.py
+    ├── PSP_microservice            # PSP source code
+    │   ├── alphafold_parser.py
+    │   └── main.py
+    ├── PSS_microservice            # PSS source code
+    │   ├── src                     # Helper functions and classes
+    │   │   ├── __init__.py   
+    │   │   ├── models.py   
+    │   │   ├── protein.py          # Class for a Protein Structure
+    │   │   └── uniprot_parser.py   # Fetches and parses Uniprot data
+    │   ├── __init__.py   
+    │   └── main.py                 # API Endpoints
+    ├── tests
+    │   ├── api_requests.http       #  Test API Endpoints
+    │   └── test_main.py            #  Unit tests
+    ├── .gitignore          
+    ├── .gitlab-ci.yml   
+    ├── Dockerfile   
+    ├── README.md
+    └── requirements.txt    
 

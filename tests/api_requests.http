@@ -1,0 +1,17 @@
+GET http://localhost/retrieve_by_uniprot_id/P12355
+
+###
+
+GET http://localhost/retrieve_by_uniprot_id/P12319
+
+###
+
+GET http://localhost/retrieve_by_uniprot_id/P05067
+
+###
+
+GET http://localhost/fetch_pdb_by_id/5BUO
+
+###
+
+GET http://localhost/download_pdb/5BUO/pdb5buo.ent

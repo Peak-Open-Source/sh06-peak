@@ -9,6 +9,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, Response
 import src.models as models
 
+from db_operations import connect_to_mongodb, get_data_from_mongodb, SampleDocument
+from docker_operations import start_docker_container
+import json
+
 try:
     from .src import uniprot_parser as uniprot_parser
     from .src.protein import Protein
@@ -196,6 +200,24 @@ def retrieve_by_key(key: str):
 def store_structure(key: str, structure: dict):
     protein_structures[key] = structure
     return {"message": "Structure stored"}
+
+def main():
+    # Database configuration
+    database_name = 'your_database_name'
+    mongodb_uri = 'your_mongodb_uri'
+    connect_to_mongodb(database_name, mongodb_uri)
+
+    # Retrieve data from the MongoDB database
+    data_from_mongo = get_data_from_mongodb()
+
+    # Write the data to a JSON file
+    with open('mongodb_data.json', 'w') as json_file:
+        json_file.write(data_from_mongo)
+
+    # Use Docker Compose to create a container and upload the data
+    start_docker_container()
+
+
 
 
 if __name__ == '__main__':

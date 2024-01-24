@@ -1,6 +1,10 @@
 from mongoengine import *
 from mongoengine import disconnect
 from pymongo import *
+import json
+from subprocess import Popen, PIPE
+
+
 
 
 #below; creates a new protein object
@@ -58,6 +62,15 @@ def search(to_find, field):
         elif field == "Key":
             document = ProteinCollection.objects.get(id=to_find)
             return(document)
+        
+        # Retrieve data from the MongoDB database
+        data_from_mongo = ProteinCollection.objects.all().to_json()
+
+        # Write the data to a JSON file
+        with open('mongodb_data.json', 'w') as json_file:
+            json_file.write(data_from_mongo)
+
+    
         
     except Exception as e:
         print(f"An error occurred: {e}")

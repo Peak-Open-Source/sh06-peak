@@ -87,7 +87,7 @@ pdb_sequences = {}
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id):
+def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]

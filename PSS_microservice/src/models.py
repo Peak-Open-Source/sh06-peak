@@ -1,108 +1,94 @@
-from pymongo import MongoClient
-import traceback
+from mongoengine import *
+from mongoengine import disconnect
+from pymongo import *
 
-# MongoDB connection URI
-uri = 'mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority'
 
-# Function to perform database operations
-def write_to_database(seq, path, url):
+#below; creates a new protein object
+class ProteinCollection(Document): 
+    Sequence = StringField(require=True)
+    PDB = StringField(required = True)
+    URL = StringField(required = True)
+    #may have to change to URLField
+    #may have to change PDB to FileField; both currently StringField for my dud tests at the bottom
+    #once checked PDB fetch failure can change and test with URL/PDBField
+
+
+def write_to_database(seq, pdb, url):
     try:
-        # Connect to the MongoDB cluster
-        client = MongoClient(uri)
-        
-        # Access the database and collection
-        database = client['ProteinDatabase']
-        collection = database['ProteinCollection']
-
-        #Function is called in PSS_microservice/main.py - fetch_pdb_by_id
-        #if already exists: update ; TO BE IMPLEMENTED
-
-        document = {
-            'Sequence': seq,
-            'PDB': path,
-            'URL': url
-        }
-
-        #exists = collection.find_one(document)
-        #if (exists == False):
-            # Insert a single document
-        result = collection.insert_one(document)
-        #else:
-            #collection.update_one(exists, document)
-            #print("document exists")
-   
-        
-        print(f"Inserted document ID: {result.inserted_id}")
-        print(f"Insertion successful!")
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        print(traceback.format_exc())  # Print detailed traceback
-        return None
-
-    finally:
-        # Close the connection
-        client.close()
-
-# Call the function to perform database operations
-
-
-#_id = ObjectID; just the id of each one, new compass version search by {_id: ObjectID('idnumber')} 
-#old version (ours i think) {"_id":{"$oid":"object_id"}}
-#sequence or key or pdb id
-def find(to_find, field):
-
-    try:
-        client = MongoClient(uri)
-        database = client['ProteinDatabase']
-        collection = database['ProteinCollection']
-
-#search by sequence, pdb and _id
-        if (field == "Sequence"):
-            protein_info = {"Sequence":to_find}
-        elif (field == "PDB"):
-            protein_info = {"PDB":to_find} 
-        elif (field == "Key"):
-            protein_info = {"_id":{"$oid":to_find}}
-
-        protein = collection.find(protein_info)
-        return protein
-
+        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        meta={'collection':'ProteinCollection'}
+        if not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url): 
+            #check if already exists; 
+            ProteinCollection(Sequence = seq, PDB=pdb, URL = url).save()
+            print("successful")
+        else:
+            print("Already stored")
+            #possibility of only duplicate sequence or any duplicate?
+            #if not MyCollection.objects(parameter='foo'):
+            #parameter = PC.obj.get(seq/pdb etc)
+            # ^^^ in theory; can check against any olne/all parameters, if full already exists just pass, 
+            #if one value exists but url diff then call update, if everythin g new store; save having to 
+            #delete and reqrite whole doc
+    
     except Exception as e:
         print(f"An error occurred: {e}")
 
     finally:
-        # Close the connection
-
-        client.close()
+        disconnect()
 
 
-#BElow; need to test, if not successful can copy doc, delete it and write_to_database with the old vals n new PDB file
-def update_file(id, new_file):
+
+def search(to_find, field):
     try:
-        client = MongoClient(uri)
-        database = client['ProteinDatabase']
-        collection = database['ProteinCollection']
+        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        meta={'collection':'ProteinCollection'}
 
-        protein_id = {"_id":{"$oid":id}}
-
-        protein = collection.find(protein_id)
-        protein = {"PDB":new_file}
-
+        if field == "Sequence":
+            document = ProteinCollection.objects.get(Sequence=to_find)
+            return(document)
+        elif field == "PDB":
+            document = ProteinCollection.objects.get(PDB=to_find)
+            return(document)
+        elif field == "Key":
+            document = ProteinCollection.objects.get(id=to_find)
+            return(document)
         
     except Exception as e:
         print(f"An error occurred: {e}")
 
     finally:
-        # Close the connection
-
-        client.close()
+        disconnect()
 
 
 
+def update_file(id_to_find, new_file):
+    try:
+        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        meta={'collection':'ProteinCollection'}
+
+        document = ProteinCollection.objects.get(id=id_to_find)
+        document.PDB = new_file
+        document.save()
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        disconnect()
 
 
-#TO CONNECT - in mongoDB compass at connect paste in uri at top of file :)
+
+
+#my little weeny tests; all working as intended
+        
+#write_to_database("accatgagatsgstaaga","16fa","wikipedia.com")
+#write_to_database("accatgagatsg","18la","google.com")
+#update_file('65afbb69f6a68a6a4e715d57', "1F6B")
+#doc_to_find = search("17fa" ,"PDB")
+#print(doc_to_find)
+
+
+#connect info:
 #& C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"
 #python sh06-main/cli/__main__.py get uniprot P12319   
 

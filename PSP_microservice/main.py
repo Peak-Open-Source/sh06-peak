@@ -26,35 +26,32 @@ def run_check():
 @celery.task
 def predict_protein_structure(sequence):
     #TODO use alphafold to predict the protien and then return the sequence
-    sequence = "Dummy sequence"
-    predicted_structure = "Dummy sequence"
+    predicted_structure = "prediction"
 
+    #return the predicted structure
     return {'sequence': sequence, 'structure': predicted_structure}
 
-@app.post("/predict")
+@app.get("/predict")
 async def predict_endpoint(sequence: str): #use async so that we can handle multiple requests coming in
     #TODO check if sequence is already being predicted 
-    #TODO queue the sequence 
-    #predict_protein_structure(sequence)
-    #TODO store the results
-    
-    #queue task
+   
+    #queue task passing sequence as a parameter 
     task = predict_protein_structure.apply_async(args=[sequence])
     #store the task id
     task_id = task.id
 
     # Check if the task is in the queue
     is_in_queue = AsyncResult(task_id).state == 'PENDING'
-
+    #displays the task id and if its in the queue
     return {"task_id": task_id, "in_queue": is_in_queue}
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
     result = AsyncResult(task_id)
     if result.state == 'PENDING':
-        raise HTTPException(status_code=404, detail="Task still in queue")
+        return {"task_id": task_id, "satus": result.state}
     if result.state == 'PREDICTING':
-        raise HTTPException(status_code=404, detail="Prediction in progress")
+        return {"task_id": task_id, "satus": result.state}
     if result.state == 'SUCCESS':
         return {"result": result.result}
     return {"status": result.state}

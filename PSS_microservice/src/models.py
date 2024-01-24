@@ -17,18 +17,24 @@ def write_to_database(seq, pdb, url):
     try:
         connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
         meta={'collection':'ProteinCollection'}
-        if not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url): 
-            #check if already exists; 
-            ProteinCollection(Sequence = seq, PDB=pdb, URL = url).save()
-            print("successful")
-        else:
+        new_doc = ProteinCollection(Sequence=seq, PDB=pdb, URL=url)
+
+        seq_query = ProteinCollection.objects(Sequence=seq)
+        pdb_query = ProteinCollection.objects(PDB=pdb)
+
+        if seq_query.count() > 0 and pdb_query.count() == 0:
+            doc_id = seq_query.first().id
+            print(doc_id)
+            update_file(doc_id, pdb)
+
+        elif ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
             print("Already stored")
-            #possibility of only duplicate sequence or any duplicate?
-            #if not MyCollection.objects(parameter='foo'):
-            #parameter = PC.obj.get(seq/pdb etc)
-            # ^^^ in theory; can check against any olne/all parameters, if full already exists just pass, 
-            #if one value exists but url diff then call update, if everythin g new store; save having to 
-            #delete and reqrite whole doc
+
+        elif not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url): 
+            #check if already exists; 
+            print("successful")
+            ProteinCollection(Sequence = seq, PDB=pdb, URL = url).save()
+            
     
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -70,6 +76,8 @@ def update_file(id_to_find, new_file):
         document.PDB = new_file
         document.save()
 
+        print("file updated")
+
     except Exception as e:
         print(f"An error occurred: {e}")
 
@@ -81,8 +89,7 @@ def update_file(id_to_find, new_file):
 
 #my little weeny tests; all working as intended
         
-#write_to_database("accatgagatsgstaaga","16fa","wikipedia.com")
-#write_to_database("accatgagatsg","18la","google.com")
+write_to_database("accatgagatsgstaaga","updatedPDB","google.com")
 #update_file('65afbb69f6a68a6a4e715d57', "1F6B")
 #doc_to_find = search("17fa" ,"PDB")
 #print(doc_to_find)

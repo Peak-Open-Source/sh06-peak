@@ -2,12 +2,18 @@ import sys
 
 from PSSClient import PSSClient
 
-ip = input("Please enter the IP of the PSS Microservice, for example http://localhost (not the port!): ")
-port = input("Please enter the corresponding port for the PSS Microservice: ")
+ip = (input("Please enter the IP of the PSS Microservice, \
+           for example http://localhost (not the port!): ")
+      if len(sys.argv) < 3 else sys.argv[1])
+port = (input("Please enter the corresponding\
+              port for the PSS Microservice: ")
+        if len(sys.argv) < 3 else sys.argv[2])
 while not port.isnumeric():
-    port = input("Please enter the corresponding port for the PSS Microservice: ")
+    port = input("Please enter the corresponding port \
+                 for the PSS Microservice: ")
 client = PSSClient(ip, int(port))
 running = True
+
 
 class Command():
     def __init__(self, name: str, description: str, func, num_args: int = 0):
@@ -68,9 +74,11 @@ def help():
         command.print()
         print("-")
 
+
 def exit():
     global running
     running = False
+
 
 COMMANDS = {
     "help": Command(
@@ -104,13 +112,24 @@ def get_command(command_args):
             command.method(*command_args[1:])
 
 
-while running:
-    print("Enter command (use \"help\" for help):")
-    command = input().split()
+def process(command):
     if len(command) < 1:
         help()
     else:
         try:
             get_command(command)
-        except:
-            print("An error occurred executing the command!\nMake sure your IP/Port and command are valid, and that the Microservice is online.")
+        except Exception:
+            print("An error occurred executing the command!\n\
+                  Make sure your IP/Port and command are valid, \
+                  and that the Microservice is online.")
+
+
+if len(sys.argv) >= 3:
+    host = sys.argv[1]
+    port = sys.argv[2]
+    process(sys.argv[3:])
+else:
+    while running:
+        print("Enter command (use \"help\" for help):")
+        command = input().split()
+        process(command)

@@ -105,13 +105,13 @@ class Protein:
     @property
     def method(self):
         return self._method
-    
+
     @property
     def is_alphafold(self):
         return self._is_alphafold
-    
+
     @method.setter
-    def is_alphafold(self, val: bool):
+    def is_alphafold(self, val: bool):  # noqa:F811 TODO
         self._is_alphafold = val
 
     @method.setter

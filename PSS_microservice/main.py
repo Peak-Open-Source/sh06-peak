@@ -9,8 +9,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 import src.models as models  # noqa:F401
 
-from db_operations import connect_to_mongodb, get_data_from_mongodb, SampleDocument
-from docker_operations import start_docker_container
+from src.db_operations import connect_to_mongodb, get_data_from_mongodb, SampleDocument
+from src.docker_operations import start_docker_container
 import json
 
 try:

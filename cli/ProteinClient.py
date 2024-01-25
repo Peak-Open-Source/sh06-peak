@@ -2,12 +2,18 @@ import sys
 
 from PSSClient import PSSClient
 
-ip = input("Please enter the IP of the PSS Microservice, for example http://localhost (not the port!): ")
-port = input("Please enter the corresponding port for the PSS Microservice: ")
+ip = (input("Please enter the IP of the PSS Microservice, \
+           for example http://localhost (not the port!): ")
+      if len(sys.argv) < 3 else sys.argv[1])
+port = (input("Please enter the corresponding\
+              port for the PSS Microservice: ")
+        if len(sys.argv) < 3 else sys.argv[2])
 while not port.isnumeric():
-    port = input("Please enter the corresponding port for the PSS Microservice: ")
+    port = input("Please enter the corresponding port \
+                 for the PSS Microservice: ")
 client = PSSClient(ip, int(port))
 running = True
+
 
 class Command():
     def __init__(self, name: str, description: str, func, num_args: int = 0):
@@ -61,6 +67,18 @@ def get(type: str, id: str):
     if type == "uniprot":
         get_best_uniprot(id)
 
+def store(file_path: str, pdb_id: str, sequence: str):
+    try: 
+        with open(file_path, "r") as pdb_file:
+            byte_info = pdb_file.read()
+            result, success = client.post("store", {"pdb_id": pdb_id, "sequence":sequence, "file_content": byte_info})
+            if "success" in result and result["success"]:
+                print("Upload successful!")
+            else:
+                print("Upload failed - make sure that the server is running, and that your file path is correct.")
+    except:
+        print("Upload failed - make sure that the server is running, and that your file path is correct.")
+        return False
 
 def help():
     print("Available Commands:\n-")
@@ -68,9 +86,11 @@ def help():
         command.print()
         print("-")
 
+
 def exit():
     global running
     running = False
+
 
 COMMANDS = {
     "help": Command(
@@ -86,6 +106,15 @@ COMMANDS = {
             \nExample Usage: get uniprot P12319",
         get,
         2
+    ),
+    "store": Command(
+        "store",
+        "Usage \
+            \"store [file_path] [pdb_id] [sequence]\"\
+            \"\nUploads PDB file to server\
+            \nExample Usage: store pdbs/A123.ent A123 123123123123123123",
+        store,
+        3
     ),
     "exit": Command(
         "exit",
@@ -104,13 +133,24 @@ def get_command(command_args):
             command.method(*command_args[1:])
 
 
-while running:
-    print("Enter command (use \"help\" for help):")
-    command = input().split()
+def process(command):
     if len(command) < 1:
         help()
     else:
         try:
             get_command(command)
-        except:
-            print("An error occurred executing the command!\nMake sure your IP/Port and command are valid, and that the Microservice is online.")
+        except Exception:
+            print("An error occurred executing the command!\n\
+                  Make sure your IP/Port and command are valid, \
+                  and that the Microservice is online.")
+
+
+if len(sys.argv) >= 3:
+    host = sys.argv[1]
+    port = sys.argv[2]
+    process(sys.argv[3:])
+else:
+    while running:
+        print("Enter command (use \"help\" for help):")
+        command = input().split()
+        process(command)

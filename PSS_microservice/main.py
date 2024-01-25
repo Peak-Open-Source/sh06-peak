@@ -7,7 +7,13 @@ import numpy as np
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, Response
-import src.models as models
+from pydantic import BaseModel
+import src.models as models  # noqa:F401
+
+from src.db_operations import connect_to_mongodb, get_data_from_mongodb
+from src.db_operations import SampleDocument  # noqa:F401
+from src.docker_operations import start_docker_container
+
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -52,10 +58,10 @@ def calulate_score(protein: Protein) -> float:
     score = ((method_weight * method_score) +
              (coverage_weight * coverage_score) +
              (resolution_weight * float(resolution_score)))
-    
+
     if protein.is_alphafold:
         score -= ALPHAFOLD_PENALTY
-    
+
     return score
 
 
@@ -98,7 +104,6 @@ def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
         if best_structure is None:
             return {"error": "No valid structure found"}
         pdb_sequences[best_structure["id"]] = sequence
-        print(pdb_sequences)
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -135,11 +140,11 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             # Some machines just return url directly
             pass
 
-    
-#below - what to be passed to models for the db
+
+# below - what to be passed to models for the db
         if pdb_id in pdb_sequences:
-            sequence = pdb_sequences[pdb_id]
-            path = os.getcwd() + "/" + pdb_id + "/" + file
+            sequence = pdb_sequences[pdb_id]  # noqa:F841
+            path = os.getcwd() + "/" + pdb_id + "/" + file  # noqa:F841
             request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
             try:
                 url = url._url
@@ -147,15 +152,14 @@ def fetch_pdb_by_id(request: Request, pdb_id):
                 pass
 
             # TODO - get database links working on pipeline
-            
+
             # models.write_to_database(sequence, path, url)
 
-            #testing the find function; works
+            # testing the find function; works
             # prot = models.find("ramen")
             # print("aaaaaaaaa")
             # print(prot)
 
-        
         return {"status": archive_result.status_code,
                 "url": url}
 
@@ -187,15 +191,58 @@ def retrieve_by_sequence(sequence: str):
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
-    #find(key, field = key)
+    # find(key, field = key)
     return
 
 
+class UploadInformation(BaseModel):
+    pdb_id: str
+    sequence: str
+    file_content: str
+
+    def clean(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        for file_name in [f for f in os.listdir(folder_path) if f != "contains.txt"]:
+            os.remove(folder_path + "/" + file_name)
+        
+
+    def store(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+            with open(folder_path + "/contains.txt", "w") as f:
+                f.write(self.pdb_id)
+        else:
+            self.clean()
+        
+        with open(f"{folder_path}/{self.pdb_id}.ent", "w") as pdb_file:
+            pdb_file.write(self.file_content)
+
+        return True
+
 # Endpoint to store protein structures
-# @app.post('/store')
-def store_structure(key: str, structure: dict):
-    protein_structures[key] = structure
-    return {"message": "Structure stored"}
+@app.post('/store')
+def store_structure(upload_information: UploadInformation):
+    protein_structures[upload_information.pdb_id] = upload_information
+    success = upload_information.store()
+    return {"success": success}
+
+
+def main():
+    # Database configuration
+    database_name = 'your_database_name'
+    mongodb_uri = 'your_mongodb_uri'
+    connect_to_mongodb(database_name, mongodb_uri)
+
+    # Retrieve data from the MongoDB database
+    data_from_mongo = get_data_from_mongodb()
+
+    # Write the data to a JSON file
+    with open('mongodb_data.json', 'w') as json_file:
+        json_file.write(data_from_mongo)
+
+    # Use Docker Compose to create a container and upload the data
+    start_docker_container()
 
 
 if __name__ == '__main__':

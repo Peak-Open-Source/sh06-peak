@@ -6,12 +6,14 @@ import numpy as np
 
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
+from pydantic import BaseModel
 import src.models as models  # noqa:F401
 
 from src.db_operations import connect_to_mongodb, get_data_from_mongodb
 from src.db_operations import SampleDocument  # noqa:F401
 from src.docker_operations import start_docker_container
+
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -102,7 +104,6 @@ def retrieve_by_uniprot_id(uniprot_id):
         if best_structure is None:
             return {"error": "No valid structure found"}
         pdb_sequences[best_structure["id"]] = sequence
-        print(pdb_sequences)
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -194,11 +195,37 @@ def retrieve_by_key(key: str):
     return
 
 
+class UploadInformation(BaseModel):
+    pdb_id: str
+    sequence: str
+    file_content: str
+
+    def clean(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        for file_name in [f for f in os.listdir(folder_path) if f != "contains.txt"]:
+            os.remove(folder_path + "/" + file_name)
+        
+
+    def store(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+            with open(folder_path + "/contains.txt", "w") as f:
+                f.write(self.pdb_id)
+        else:
+            self.clean()
+        
+        with open(f"{folder_path}/{self.pdb_id}.ent", "w") as pdb_file:
+            pdb_file.write(self.file_content)
+
+        return True
+
 # Endpoint to store protein structures
-# @app.post('/store')
-def store_structure(key: str, structure: dict):
-    protein_structures[key] = structure
-    return {"message": "Structure stored"}
+@app.post('/store')
+def store_structure(upload_information: UploadInformation):
+    protein_structures[upload_information.pdb_id] = upload_information
+    success = upload_information.store()
+    return {"success": success}
 
 
 def main():

@@ -1,10 +1,9 @@
-from mongoengine import *
-from mongoengine import disconnect
-from pymongo import *
-import json
-from subprocess import Popen, PIPE
+# flake8: noqa
 
-
+from mongoengine import MongoClient  # noqa:F403
+from mongoengine import disconnect  # noqa:F401
+from pymongo import *  # noqa:F403
+from subprocess import Popen, PIPE   # noqa:F401
 
 
 # Function to perform database operations

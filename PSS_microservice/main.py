@@ -9,9 +9,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
 import src.models as models  # noqa:F401
 
-from src.db_operations import connect_to_mongodb, get_data_from_mongodb, SampleDocument
+from src.db_operations import connect_to_mongodb, get_data_from_mongodb
+from src.db_operations import SampleDocument  # noqa:F401
 from src.docker_operations import start_docker_container
-import json
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -200,6 +200,7 @@ def store_structure(key: str, structure: dict):
     protein_structures[key] = structure
     return {"message": "Structure stored"}
 
+
 def main():
     # Database configuration
     database_name = 'your_database_name'
@@ -215,8 +216,6 @@ def main():
 
     # Use Docker Compose to create a container and upload the data
     start_docker_container()
-
-
 
 
 if __name__ == '__main__':

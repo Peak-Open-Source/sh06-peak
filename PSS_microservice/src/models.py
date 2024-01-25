@@ -1,6 +1,6 @@
 # flake8: noqa
 
-from mongoengine import MongoClient  # noqa:F403
+from mongoengine import *  # noqa:F403
 from mongoengine import disconnect  # noqa:F401
 from pymongo import *  # noqa:F403
 from subprocess import Popen, PIPE   # noqa:F401

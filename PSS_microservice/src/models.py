@@ -1,9 +1,10 @@
-from pymongo import MongoClient
-import traceback
+from mongoengine import *
+from mongoengine import disconnect
+from pymongo import *
+import json
+from subprocess import Popen, PIPE
 
-# MongoDB connection URI
-uri = 'mongodb+srv://proteinLovers:protein-Lovers2\
-    @cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority'
+
 
 
 # Function to perform database operations
@@ -59,13 +60,27 @@ def find(to_find, field):
         database = client['ProteinDatabase']
         collection = database['ProteinCollection']
 
-# search by sequence, pdb and _id
-        if (field == "Sequence"):
-            protein_info = {"Sequence": to_find}
-        elif (field == "PDB"):
-            protein_info = {"PDB": to_find}
-        elif (field == "Key"):
-            protein_info = {"_id": {"$oid": to_find}}
+        if field == "Sequence":
+            document = ProteinCollection.objects.get(Sequence=to_find)
+            return(document)
+        elif field == "PDB":
+            document = ProteinCollection.objects.get(PDB=to_find)
+            return(document)
+        elif field == "Key":
+            document = ProteinCollection.objects.get(id=to_find)
+            return(document)
+        
+        # Retrieve data from the MongoDB database
+        data_from_mongo = ProteinCollection.objects.all().to_json()
+
+        # Write the data to a JSON file
+        with open('mongodb_data.json', 'w') as json_file:
+            json_file.write(data_from_mongo)
+
+    
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
         protein = collection.find(protein_info)
         return protein

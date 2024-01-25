@@ -1,0 +1,11 @@
+FROM python:3.11.7
+
+WORKDIR /PSP
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY celery_config.py .
+COPY main.py .
+
+CMD ["celery", "-A", "main.celery", "worker", "--loglevel=info"]

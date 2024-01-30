@@ -87,13 +87,16 @@ def find_matching_structures(sequence: str):
                if structure['sequence'] == sequence]
     return matches
 
-
+best_structures = {}
 pdb_sequences = {}
 # Endpoint to retrieve protein structures by Uniprot ID
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
 def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
+    if not noCache and uniprot_id in best_structures:
+        return {'structure': best_structures[uniprot_id],
+                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]}
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]
@@ -103,6 +106,7 @@ def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
         best_structure = select_best_structure(parsed_proteins)
         if best_structure is None:
             return {"error": "No valid structure found"}
+        best_structures[uniprot_id] = best_structure
         pdb_sequences[best_structure["id"]] = sequence
         return {'structure': best_structure,
                 'sequence': sequence}

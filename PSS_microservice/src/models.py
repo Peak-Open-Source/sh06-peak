@@ -1,10 +1,13 @@
 from mongoengine import *
-from mongoengine import disconnect
+from mongoengine import connect, disconnect
 from pymongo import *
 import json
 from subprocess import Popen, PIPE
 
+if 'default' in connect._connections:
+    disconnect(alias='default')
 
+connect(db='protein_collection', alias = 'default', host='mongodb://localhost:27017', username='proteinLovers', password='protein-Lovers2')
 
 
 #below; creates a new protein object
@@ -17,10 +20,11 @@ class ProteinCollection(Document):
     #once checked PDB fetch failure can change and test with URL/PDBField
 
 
+
 def write_to_database(seq, pdb, url):
     try:
         connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
-        meta={'collection':'ProteinCollection'}
+        meta={'collection':'protein_collection'}
         new_doc = ProteinCollection(Sequence=seq, PDB=pdb, URL=url)
 
         seq_query = ProteinCollection.objects(Sequence=seq)
@@ -40,11 +44,15 @@ def write_to_database(seq, pdb, url):
             ProteinCollection(Sequence = seq, PDB=pdb, URL = url).save()
             
     
+    
     except Exception as e:
         print(f"An error occurred: {e}")
 
     finally:
+        instance = ProteinCollection(Sequence=seq, PDB=pdb, URL=url)
+        instance.save(alias='default')
         disconnect()
+    
 
 
 

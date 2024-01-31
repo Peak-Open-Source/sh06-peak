@@ -39,6 +39,9 @@ def predict_protein_structure(sequence):
             status_code=400,
             detail="Task already in progress for this sequence"
         )
+    # Check if the task is in the queue
+    with sequence_lock:
+        sequence_task_status[sequence] = 'PENDING'
 
     # for testing
     time.sleep(60)
@@ -59,16 +62,11 @@ async def predict_endpoint(sequence: str):
     # TODO check if sequence is already being predicted
 
     # queue task passing sequence as a parameter
-
     task = predict_protein_structure.apply_async(args=[sequence])
 
     # store the task id
     task_id = task.id
-
-    # Check if the task is in the queue
     is_in_queue = AsyncResult(task_id).state == 'PENDING'
-    with sequence_lock:
-        sequence_task_status[sequence] = 'PENDING'
     # displays the task id and if its in the queue
     return {"task_id": task_id, "in_queue": is_in_queue}
 

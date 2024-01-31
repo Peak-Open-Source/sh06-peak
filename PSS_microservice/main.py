@@ -173,10 +173,9 @@ def fetch_pdb_by_id(request: Request, pdb_id):
                 "error": archive_result.reason}
 
 
-# TODO - Simplify endpoint call to "/download_pdb/{pdb_id}"
 @app.get("/download_pdb/{pdb_id}")
-def download_pdb(pdb_id, file_name):
-    file_name = pdb_id + ".ent"
+def download_pdb(pdb_id):
+    file_name = f"pdb{pdb_id.lower()}.ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):

@@ -1,40 +1,25 @@
-version: '3.8'
+version: '3'
 services:
   mongodb:
-    image: mongo:latest # use the latest image.
-    #container_name: mongodb
-    restart: always
-    environment: # set required env variables to access mongo
-      MONGO_INITDB_ROOT_USERNAME: proteinLovers
-      MONGO_INITDB_ROOT_PASSWORD: protein-Lovers2
+    image: mongo
     ports:
-      - 27018:27017
-    #volumes: # optional to preserve database after container is deleted.
-     # - mongodb_data:/data/db
+      - "80:27017"
+    #restart: always
+
+
+  myapp:
     
-  pss:
     build: .
     ports:
-      - "8080:8081"
-    
-  pc:
-    build: .
-    ports:
-      - "5000:5000"
+      - "8000:8000"
     depends_on:
       - mongodb
-    
+    volumes:
+      - ./main.py:/src/main.py
   
-  # Mongo Express Service
-  mongo-express:
-    image: mongo-express:latest # latest image
-    container_name: mongo-express
-    restart: always
+  mongo_express:
+    image: mongo-express
+
     ports:
-      - 9000:9001
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: proteinLovers
-      ME_CONFIG_MONGODB_ADMINPASSWORD: protein-Lovers2
-      ME_CONFIG_MONGODB_SERVER: mongo-express 
-      # use the name of the mongo container above for server env var.
-      # In our case this is mongodb
+      - 5999:6000
+  

@@ -6,7 +6,7 @@ import numpy as np
 
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import src.models as models  # noqa:F401
 
@@ -86,6 +86,7 @@ def find_matching_structures(sequence: str):
     matches = [structure for structure in protein_structures.values()
                if structure['sequence'] == sequence]
     return matches
+
 
 best_structures = {}
 pdb_sequences = {}
@@ -206,9 +207,9 @@ class UploadInformation(BaseModel):
 
     def clean(self):
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
-        for file_name in [f for f in os.listdir(folder_path) if f != "contains.txt"]:
+        for file_name in [f for f in os.listdir(folder_path)
+                          if f != "contains.txt"]:
             os.remove(folder_path + "/" + file_name)
-        
 
     def store(self):
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
@@ -218,11 +219,12 @@ class UploadInformation(BaseModel):
                 f.write(self.pdb_id)
         else:
             self.clean()
-        
+
         with open(f"{folder_path}/{self.pdb_id}.ent", "w") as pdb_file:
             pdb_file.write(self.file_content)
 
         return True
+
 
 # Endpoint to store protein structures
 @app.post('/store')

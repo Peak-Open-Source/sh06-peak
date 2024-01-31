@@ -1,4 +1,4 @@
-from mongoengine import connect, Document, StringField, disconnect 
+from mongoengine import connect, Document, StringField, disconnect, DictField
 from pymongo import *
 import json
 from subprocess import Popen, PIPE
@@ -21,16 +21,16 @@ def write_to_database(seq, pdb, url):
         meta={'collection':'ProteinCollection'}
         new_doc = ProteinCollection(Sequence=seq, PDB=pdb, URL=url)
 
-            seq_query = ProteinCollection.objects(Sequence=seq)
-            pdb_query = ProteinCollection.objects(PDB=pdb)
+        seq_query = ProteinCollection.objects(Sequence=seq)
+        pdb_query = ProteinCollection.objects(PDB=pdb)
 
-            if seq_query.count() > 0 and pdb_query.count() == 0:
-                doc_id = seq_query.first().id
-                print(doc_id)
-                update_structure(doc_id, pdb)
+        if seq_query.count() > 0 and pdb_query.count() == 0:
+            doc_id = seq_query.first().id
+            print(doc_id)
+            update_structure(doc_id, pdb)
 
-            elif ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
-                print("Already stored")
+        elif ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
+            print("Already stored")
 
         elif not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url): 
             #check if already exists; 

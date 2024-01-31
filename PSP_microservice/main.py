@@ -34,12 +34,11 @@ def run_check():
 def predict_protein_structure(sequence):
     # Checks if the seqeunce is already in the queue
     if sequence in sequence_task_status:
-        if sequence_task_status[sequence] == 'PENDING':
-            # if task found throw error and don't queue
-            raise HTTPException(
-                status_code=400,
-                detail="Task already in progress for this sequence"
-            )
+        # if task found throw error and don't queue
+        raise HTTPException(
+            status_code=400,
+            detail="Task already in progress for this sequence"
+        )
 
     # for testing
     time.sleep(60)

@@ -1,12 +1,21 @@
 
-# Use the official Python image as the base image
-FROM python:3
+FROM python:3.8-slim
 
-WORKDIR /sh06-main
+# Set the working directory in the container
+WORKDIR /src
 
-ENV PIP_ROOT_USER_ACTION=ignore
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the current directory contents into the container
+COPY requirements.txt .
 
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+COPY . .
+# Make port 80 available to the world outside this container
 EXPOSE 8000
 
-CMD ["python3" "/src/models.py"]
+# Define environment variable
+ENV PIP_ROOT_USER_ACTION=ignore
+
+# Run main.py when the container launches
+CMD ["python", "./main.py"]

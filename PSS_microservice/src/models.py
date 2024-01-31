@@ -1,11 +1,8 @@
-from mongoengine import *
-from mongoengine import connect, disconnect
+from mongoengine import connect, Document, StringField, disconnect 
 from pymongo import *
 import json
 from subprocess import Popen, PIPE
 
-if 'default' in connect._connections:
-    disconnect(alias='default')
 
 connect(db='protein_collection', alias = 'default', host='mongodb://localhost:27017', username='proteinLovers', password='protein-Lovers2')
 

@@ -137,7 +137,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         # sequence = pdb_sequences[pdb_id]
 
         # path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+        url = request.url_for("download_pdb", pdb_id=pdb_id)
 
         try:
             url = url._url
@@ -150,7 +150,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]  # noqa:F841
             path = os.getcwd() + "/" + pdb_id + "/" + file  # noqa:F841
-            request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+            request.url_for("download_pdb", pdb_id=pdb_id)
             try:
                 url = url._url
             except AttributeError:
@@ -174,8 +174,9 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
 
 # TODO - Simplify endpoint call to "/download_pdb/{pdb_id}"
-@app.get("/download_pdb/{pdb_id}/{file_name}")
+@app.get("/download_pdb/{pdb_id}")
 def download_pdb(pdb_id, file_name):
+    file_name = pdb_id + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):

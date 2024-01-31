@@ -10,7 +10,7 @@ class TestDatabase(unittest.TestCase):
     def connection(self):
         # connect to database
         connect('ProteinDatabase', host="mongodb+srv://proteinLovers:\
-                protein\-Lovers2@cluster0.pbzu8xb.mongodb.net/?\
+                protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?\
                 retryWrites=true&w=majority")
 
     def disconnection(self):

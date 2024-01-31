@@ -58,7 +58,7 @@ def get_best_uniprot(id: str):
         print("PDB Download failure")
         return
 
-    with open("pdb" + pdb_id + ".ent", "wb") as f:
+    with open("pdb" + pdb_id.lower() + ".ent", "wb") as f:
         f.write(fetch_result)
     print("Download successful, saved as", "pdb" + pdb_id + ".ent")
 

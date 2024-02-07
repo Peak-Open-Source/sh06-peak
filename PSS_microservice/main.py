@@ -1,8 +1,10 @@
 import json
 import tarfile
 import os
+from pytest import console_main
 import requests
 import numpy as np
+import pymongo as MongoClient
 
 
 from fastapi import FastAPI, Request
@@ -23,6 +25,8 @@ except ImportError:
 ALPHAFOLD_PENALTY = .1
 
 app = FastAPI()
+HOST = "0.0.0.0"
+PORT = 5000
 
 # This should be a from our database of stored structures
 protein_structures = {}
@@ -183,7 +187,8 @@ def download_pdb(pdb_id, file_name):
 @app.post('/retrieve_by_sequence')
 def retrieve_by_sequence(sequence: str):
     # logic for getting protein from uniprot by id
-    return
+    document = models.search(sequence, "Sequence")
+    return document
 
 
 # Endpoint to retrieve sequence structures by key
@@ -191,7 +196,8 @@ def retrieve_by_sequence(sequence: str):
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
     # find(key, field = key)
-    return
+    document = models.search(key, "Key")
+    return document
 
 
 # Endpoint to store protein structures
@@ -202,22 +208,26 @@ def store_structure(key: str, structure: dict):
 
 
 def main():
-    # Database configuration
-    database_name = 'your_database_name'
-    mongodb_uri = 'your_mongodb_uri'
-    connect_to_mongodb(database_name, mongodb_uri)
 
-    # Retrieve data from the MongoDB database
-    data_from_mongo = get_data_from_mongodb()
+    uri = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"
 
-    # Write the data to a JSON file
-    with open('mongodb_data.json', 'w') as json_file:
-        json_file.write(data_from_mongo)
+    client = MongoClient(uri)
+    async def run():
+        try:
+            await client.connect()
+            global_and_us = client.covid19.global_and_us
+            cursor = global_and_us.find({"country": "France"}).sort("date", -1).limit(2)
+            async for document in cursor:
+                print(document)
+        finally:
+            await client.close()
 
-    # Use Docker Compose to create a container and upload the data
-    start_docker_container()
+            await run()
+
+    run().catch(console_main.dir)
+
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=HOST, port=PORT)

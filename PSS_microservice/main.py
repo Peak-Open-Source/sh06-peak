@@ -88,12 +88,16 @@ def find_matching_structures(sequence: str):
     return matches
 
 
+best_structures = {}
 pdb_sequences = {}
 # Endpoint to retrieve protein structures by Uniprot ID
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id):
+def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
+    if not noCache and uniprot_id in best_structures:
+        return {'structure': best_structures[uniprot_id],
+                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]}
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]
@@ -103,6 +107,7 @@ def retrieve_by_uniprot_id(uniprot_id):
         best_structure = select_best_structure(parsed_proteins)
         if best_structure is None:
             return {"error": "No valid structure found"}
+        best_structures[uniprot_id] = best_structure
         pdb_sequences[best_structure["id"]] = sequence
         return {'structure': best_structure,
                 'sequence': sequence}
@@ -132,7 +137,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         # sequence = pdb_sequences[pdb_id]
 
         # path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+        url = request.url_for("download_pdb", pdb_id=pdb_id)
 
         try:
             url = url._url
@@ -145,7 +150,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]  # noqa:F841
             path = os.getcwd() + "/" + pdb_id + "/" + file  # noqa:F841
-            request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+            request.url_for("download_pdb", pdb_id=pdb_id)
             try:
                 url = url._url
             except AttributeError:
@@ -168,9 +173,9 @@ def fetch_pdb_by_id(request: Request, pdb_id):
                 "error": archive_result.reason}
 
 
-# TODO - Simplify endpoint call to "/download_pdb/{pdb_id}"
-@app.get("/download_pdb/{pdb_id}/{file_name}")
-def download_pdb(pdb_id, file_name):
+@app.get("/download_pdb/{pdb_id}")
+def download_pdb(pdb_id):
+    file_name = f"pdb{pdb_id.lower()}.ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):

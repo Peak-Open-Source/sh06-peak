@@ -58,7 +58,7 @@ def get_best_uniprot(id: str):
         print("PDB Download failure")
         return
 
-    with open("pdb" + pdb_id + ".ent", "wb") as f:
+    with open("pdb" + pdb_id.lower() + ".ent", "wb") as f:
         f.write(fetch_result)
     print("Download successful, saved as", "pdb" + pdb_id + ".ent")
 
@@ -67,18 +67,24 @@ def get(type: str, id: str):
     if type == "uniprot":
         get_best_uniprot(id)
 
+
 def store(file_path: str, pdb_id: str, sequence: str):
-    try: 
+    try:
         with open(file_path, "r") as pdb_file:
             byte_info = pdb_file.read()
-            result, success = client.post("store", {"pdb_id": pdb_id, "sequence":sequence, "file_content": byte_info})
+            result, success = client.post("store",
+                                          {
+                                              "pdb_id": pdb_id,
+                                              "sequence": sequence,
+                                              "file_content": byte_info})
             if "success" in result and result["success"]:
                 print("Upload successful!")
             else:
-                print("Upload failed - make sure that the server is running, and that your file path is correct.")
-    except:
-        print("Upload failed - make sure that the server is running, and that your file path is correct.")
+                print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
+    except Exception:
+        print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
         return False
+
 
 def help():
     print("Available Commands:\n-")

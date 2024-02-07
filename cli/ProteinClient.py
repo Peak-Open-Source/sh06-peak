@@ -53,7 +53,7 @@ def get_best_uniprot(id: str):
         return
 
     url_split = fetch_result["url"].split("/")
-    fetch_result, success = client.download("download_pdb", url_split[4:])
+    fetch_result, success = client.download("download_pdb", url_split[2:])
     if not success or "error" in str(fetch_result):
         print("PDB Download failure")
         return

@@ -131,34 +131,20 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             tar.extractall(f"./{pdb_id}")
         os.remove("tmp.tar.gz")
 
-        file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id)
-                if f != "contains.txt"][0]
         # below - what to be passed to models for the db
         # sequence = pdb_sequences[pdb_id]
 
         # path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id)
-
-        try:
-            url = url._url
-        except AttributeError:
-            # Some machines just return url directly
-            pass
+        url = "/download_pdb/" + pdb_id
 
 
 # below - what to be passed to models for the db
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]  # noqa:F841
-            path = os.getcwd() + "/" + pdb_id + "/" + file  # noqa:F841
-            request.url_for("download_pdb", pdb_id=pdb_id)
-            try:
-                url = url._url
-            except AttributeError:
-                pass
 
             # TODO - get database links working on pipeline
 
-            # models.write_to_database(sequence, path, url)
+            models.create_or_update(sequence, pdb_id, url)
 
             # testing the find function; works
             # prot = models.find("ramen")
@@ -220,13 +206,12 @@ class UploadInformation(BaseModel):
         else:
             self.clean()
 
-        with open(f"{folder_path}/{self.pdb_id}.ent", "w") as pdb_file:
+        with open(f"{folder_path}/pdb{self.pdb_id.lower()}.ent", "w") as pdb_file:  # noqa:E501
             pdb_file.write(self.file_content)
 
-        models.write_to_database(self.sequence,
-                                 f"{folder_path}/{self.pdb_id}.ent",
-                                 requests.url_for("download_pdb",
-                                                  pdb_id=self.pdb_id))
+        models.create_or_update(self.sequence,
+                                self.pdb_id,
+                                "/download_pdb/" + self.pdb_id)
 
         return True
 

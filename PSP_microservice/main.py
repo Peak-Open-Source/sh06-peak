@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 import json
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from celery import Celery
 from celery.result import AsyncResult
 import time
@@ -27,7 +27,32 @@ App to retrive and request predictions from alphafold
 
 @app.get("/")  # test
 def run_check():
-    return {"message": "running! :)"}
+    """
+    Endpoint to check if the application is running.
+
+    Returns:
+        str: HTML formatted message indicating the application is running along with links to other endpoints.
+    """
+    html_content = """
+    <html>
+        <head>
+            <title>AlphaFold API</title>
+        </head>
+        <body>
+            <h1>AlphaFold API</h1>
+            <p>running :)</p>
+            <h2>Endpoints:</h2>
+            <ul>
+                <li><strong>Predict Protein Structure:</strong> Endpoint to predict protein structure. <a href="/predict">Go to endpoint</a></li>
+                <li><strong>Get Predicted Data:</strong> Endpoint to retrieve predicted data. <a href="/get_predicted/{qualifier}">Go to endpoint</a></li>
+                <li><strong>Get AlphaFold Sequence:</strong> Endpoint to retrieve AlphaFold sequence. <a href="/get_sequence/{qualifier}">Go to endpoint</a></li>
+                <li><strong>Check Task Status:</strong> Endpoint to check task status. <a href="/task/{task_id}">Go to endpoint</a></li>
+                <li><strong>Show Structure:</strong> Endpoint to show protein structure. <a href="/showstruct/{qualifier}">Go to endpoint</a></li>
+            </ul>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content, status_code=200)
 
 
 @celery.task
@@ -122,3 +147,6 @@ def show_structure(qualifier):
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+

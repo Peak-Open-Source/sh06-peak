@@ -1,7 +1,4 @@
 from mongoengine import connect, Document, StringField, disconnect, DictField
-from pymongo import *
-import json
-from subprocess import Popen, PIPE
 
 
 # below; creates a new protein object
@@ -26,9 +23,8 @@ def create_or_update(seq, pdb, url):
 
 def write_to_database(seq, pdb, url):
     try:
-        connect('ProteinDatabase', 
+        connect('ProteinDatabase',
                 host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
-        
 
         seq_query = ProteinCollection.objects(Sequence=seq)
         pdb_query = ProteinCollection.objects(PDB=pdb)
@@ -75,7 +71,7 @@ def search(to_find, field):
 
 def update_structure(id_to_find, new_structure):
     try:
-        connect('ProteinDatabase', 
+        connect('ProteinDatabase',
                 host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_structure
@@ -88,7 +84,7 @@ def update_structure(id_to_find, new_structure):
 
 def delete_file(to_delete, field):
     try:
-        connect('ProteinDatabase', 
+        connect('ProteinDatabase',
                 host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
         # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":

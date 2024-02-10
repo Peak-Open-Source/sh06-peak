@@ -108,7 +108,7 @@ def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
         if best_structure is None:
             return {"error": "No valid structure found"}
         best_structures[uniprot_id] = best_structure
-        pdb_sequences[best_structure["id"]] = sequence
+        pdb_sequences[best_structure["id"].lower()] = sequence
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -118,6 +118,7 @@ def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
 def fetch_pdb_by_id(request: Request, pdb_id):
+    pdb_id = pdb_id.lower()
     archive_url = ("https://www.ebi.ac.uk/pdbe/download/api/pdb"
                    f"/entry/archive?data_format=pdb&id={pdb_id}")
     archive_result = requests.get(archive_url)
@@ -161,7 +162,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
 @app.get("/download_pdb/{pdb_id}")
 def download_pdb(pdb_id):
-    file_name = f"pdb{pdb_id.lower()}.ent"
+    file_name = "pdb" + pdb_id.lower() + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):
@@ -243,4 +244,4 @@ def main():
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=80)

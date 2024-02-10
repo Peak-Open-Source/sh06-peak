@@ -89,7 +89,7 @@ class TestClient():
         assert "url" in result.json()
         path = f"{os.getcwd()}/{structure_id}"
         assert os.path.exists(path)
-        response = client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
+        response = client.get(result.json()["url"])
         file_content = response.content
         with open(f"{structure_id}.ent", "wb") as f:
             f.write(file_content)
@@ -103,7 +103,7 @@ class TestClient():
 
 class TestBestStructure():
     def test_select_best_structure(self):
-        # Dummy protiens
+        # Dummy proteins
         protein_xray = Protein(id=1, method="X-ray",
                                resolution=2.0, coverage=75)
         protein_nmr = Protein(id=2, method="NMR",

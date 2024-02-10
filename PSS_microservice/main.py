@@ -97,7 +97,10 @@ pdb_sequences = {}
 def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
     if not noCache and uniprot_id in best_structures:
         return {'structure': best_structures[uniprot_id],
-                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]}
+                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]
+                if best_structures[uniprot_id]["id"] in pdb_sequences
+                else "SequenceNotFound"
+                }
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]

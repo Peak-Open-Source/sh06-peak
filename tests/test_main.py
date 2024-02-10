@@ -87,7 +87,8 @@ class TestClient():
                                   + protein_id).json()["structure"]["id"]
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}/{structure_id.lower()}"
+        structure_id = structure_id.lower()
+        path = f"{os.getcwd()}/{structure_id}"
         assert os.path.exists(path)
         response = client.get(result.json()["url"])
         file_content = response.content

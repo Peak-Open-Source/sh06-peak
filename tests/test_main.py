@@ -72,6 +72,7 @@ class TestClient():
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
         path = f"{os.getcwd()}/{structure_id}"
+        print(os.listdir())
         print(path)
         assert os.path.exists(path)
         shutil.rmtree(path)
@@ -89,6 +90,7 @@ class TestClient():
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
         path = f"{os.getcwd()}/{structure_id}"
+        print(os.listdir())
         print(path)
         assert os.path.exists(path)
         response = client.get(result.json()["url"])

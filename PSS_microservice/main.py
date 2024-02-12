@@ -31,12 +31,14 @@ class UploadInformation(BaseModel):
     file_content: str
 
     def clean(self):
+        self.pdb_id = self.pdb_id.lower()
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
         for file_name in [f for f in os.listdir(folder_path)
                           if f != "contains.txt"]:
             os.remove(folder_path + "/" + file_name)
 
     def store(self):
+        self.pdb_id = self.pdb_id.lower()
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)

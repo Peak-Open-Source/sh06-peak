@@ -59,13 +59,14 @@ def search(to_find, field):
     try:
         connect('ProteinDatabase', host=HOST_URL)  # noqa:E501
         if field == "Sequence":
-            document = ProteinCollection.objects.get(Sequence=to_find)
+            document = ProteinCollection.objects(Sequence=to_find).first()
             return (document)
         elif field == "PDB":
-            document = ProteinCollection.objects.get(PDB=to_find)
+            to_find = to_find.lower()
+            document = ProteinCollection.objects(PDB=to_find).first()
             return (document)
         elif field == "Key":
-            document = ProteinCollection.objects.get(id=to_find)
+            document = ProteinCollection.objects(id=to_find).first()
             return (document)
 
     except Exception as e:

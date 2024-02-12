@@ -1,5 +1,7 @@
 from mongoengine import connect, Document, StringField, disconnect
 
+HOST_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
+
 
 # below; creates a new protein object
 class ProteinCollection(Document):
@@ -10,7 +12,7 @@ class ProteinCollection(Document):
 
 
 def create_or_update(seq, pdb, url, file_content):
-    connect('ProteinDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+    connect('ProteinDatabase', host=HOST_URL)
     collection = ProteinCollection.objects(PDB=pdb)
     if collection.count() > 0:
         for entry in collection:
@@ -25,8 +27,7 @@ def create_or_update(seq, pdb, url, file_content):
 
 def write_to_database(seq, pdb, url, file_content):
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
 
         seq_query = ProteinCollection.objects(Sequence=seq)
         pdb_query = ProteinCollection.objects(PDB=pdb)
@@ -55,9 +56,8 @@ def write_to_database(seq, pdb, url, file_content):
 
 def search(to_find, field):
     # returns entire document; not just value searched for; can be changed
-    # document = ProteinCollection.objects.only('Sequence').get(Sequence=to_find) ;  for specific fields to be returned
     try:
-        connect('ProteinDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)  # noqa:E501
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_find)
             return (document)
@@ -76,8 +76,7 @@ def search(to_find, field):
 
 def update_structure(id_to_find, new_structure):
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_structure
         document.save()
@@ -89,8 +88,7 @@ def update_structure(id_to_find, new_structure):
 
 def delete_file(to_delete, field):
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
         # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_delete)
@@ -115,5 +113,5 @@ def delete_file(to_delete, field):
 # print(doc_to_find)
 # connect info:
 
-# & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"
+# & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"   # noqa:E501
 # python sh06-main/cli/__main__.py get uniprot P12319

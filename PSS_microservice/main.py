@@ -24,38 +24,6 @@ except ImportError:
 
 ALPHAFOLD_PENALTY = .1
 
-
-class UploadInformation(BaseModel):
-    pdb_id: str
-    sequence: str
-    file_content: str
-
-    def clean(self):
-        folder_path = f"{os.getcwd()}/{self.pdb_id}"
-        for file_name in [f for f in os.listdir(folder_path)
-                          if f != "contains.txt"]:
-            os.remove(folder_path + "/" + file_name)
-
-    def store(self):
-        folder_path = f"{os.getcwd()}/{self.pdb_id}"
-        if not os.path.exists(folder_path):
-            os.mkdir(folder_path)
-            with open(folder_path + "/contains.txt", "w") as f:
-                f.write(self.pdb_id)
-        else:
-            self.clean()
-
-        with open(f"{folder_path}/pdb{self.pdb_id.lower()}.ent", "w") as pdb_file:  # noqa:E501
-            pdb_file.write(self.file_content)
-
-        models.create_or_update(self.sequence,
-                                self.pdb_id,
-                                "/download_pdb/" + self.pdb_id,
-                                self.file_content)
-
-        return True
-
-
 app = FastAPI()
 
 # This should be a from our database of stored structures
@@ -179,14 +147,8 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             sequence = pdb_sequences[pdb_id]  # noqa:F841
 
             # TODO - get database links working on pipeline
-            file_name = "pdb" + pdb_id.lower() + ".ent"
-            path = f"{os.getcwd()}/{pdb_id}/{file_name}"
 
-            file_content = ""
-            with open(path) as f:
-                file_content = f.read()
-
-            models.create_or_update(sequence, pdb_id, url, file_content)
+            models.create_or_update(sequence, pdb_id, url)
 
             # testing the find function; works
             # prot = models.find("ramen")
@@ -203,15 +165,8 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
 @app.get("/download_pdb/{pdb_id}")
 def download_pdb(pdb_id):
-    existing_collection = models.search(pdb_id, "PDB")
     file_name = "pdb" + pdb_id.lower() + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
-
-    if existing_collection is not None and not os.path.exists(path):
-        UploadInformation(pdb_id=pdb_id,
-                          sequence=existing_collection.Sequence,
-                          file_content=existing_collection.FileContent).store()
-
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):
         return FileResponse(path, media_type='application/octet-stream',
@@ -233,6 +188,36 @@ def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
     # find(key, field = key)
     return
+
+
+class UploadInformation(BaseModel):
+    pdb_id: str
+    sequence: str
+    file_content: str
+
+    def clean(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        for file_name in [f for f in os.listdir(folder_path)
+                          if f != "contains.txt"]:
+            os.remove(folder_path + "/" + file_name)
+
+    def store(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+            with open(folder_path + "/contains.txt", "w") as f:
+                f.write(self.pdb_id)
+        else:
+            self.clean()
+
+        with open(f"{folder_path}/pdb{self.pdb_id.lower()}.ent", "w") as pdb_file:  # noqa:E501
+            pdb_file.write(self.file_content)
+
+        models.create_or_update(self.sequence,
+                                self.pdb_id,
+                                "/download_pdb/" + self.pdb_id)
+
+        return True
 
 
 # Endpoint to store protein structures

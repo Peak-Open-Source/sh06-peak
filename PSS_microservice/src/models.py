@@ -1,4 +1,4 @@
-from mongoengine import connect, Document, StringField, disconnect, DictField
+from mongoengine import connect, Document, StringField, disconnect
 
 
 # below; creates a new protein object
@@ -6,9 +6,10 @@ class ProteinCollection(Document):
     Sequence = StringField(require=True)
     PDB = StringField(required=True)
     URL = StringField(required=True)
+    FileContent = StringField(required=True)
 
 
-def create_or_update(seq, pdb, url):
+def create_or_update(seq, pdb, url, file_content):
     connect('ProteinDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
     collection = ProteinCollection.objects(PDB=pdb)
     if collection.count() > 0:
@@ -16,12 +17,13 @@ def create_or_update(seq, pdb, url):
             entry.PDB = pdb
             entry.Sequence = seq
             entry.URL = url
+            entry.FileContent = file_content
             entry.save()
     else:
-        write_to_database(seq, pdb, url)
+        write_to_database(seq, pdb, url, file_content)
 
 
-def write_to_database(seq, pdb, url):
+def write_to_database(seq, pdb, url, file_content):
     try:
         connect('ProteinDatabase',
                 host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
@@ -40,7 +42,10 @@ def write_to_database(seq, pdb, url):
         elif not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
             # check if already exists;
             print("successful")
-            ProteinCollection(Sequence=seq, PDB=pdb, URL=url).save()
+            ProteinCollection(Sequence=seq,
+                              PDB=pdb,
+                              URL=url,
+                              FileContent=file_content).save()
 
     except Exception as e:
         print(f"An error occurred: {e}")

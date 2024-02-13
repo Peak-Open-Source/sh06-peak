@@ -223,18 +223,29 @@ def download_pdb(pdb_id):
 
 
 # Endpoint to retrieve protein structures by sequence
-@app.post('/retrieve_by_sequence')
+@app.get('/retrieve_by_sequence/{sequence}')
 def retrieve_by_sequence(sequence: str):
-    # logic for getting protein from uniprot by id
-    return
+    protein = models.search(sequence, "Sequence")
+    if protein is not None:
+        return {
+            "pdb": protein.PDB,
+            "sequence": protein.Sequence,
+            "url": protein.URL
+        }
+    return {"status": 404, "error": "No corresponding protein found"}
 
 
 # Endpoint to retrieve sequence structures by key
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
-    # logic for getting sequence from uniprot by key
-    # find(key, field = key)
-    return
+    protein = models.search(key, "Key")
+    if protein is not None:
+        return {
+            "pdb": protein.PDB,
+            "sequence": protein.Sequence,
+            "url": protein.URL
+        }
+    return {"status": 404, "error": "No corresponding protein found"}
 
 
 # Endpoint to store protein structures

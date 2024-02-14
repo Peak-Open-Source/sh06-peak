@@ -190,11 +190,6 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
             models.create_or_update(sequence, pdb_id, url, file_content)
 
-            # testing the find function; works
-            # prot = models.find("ramen")
-            # print("aaaaaaaaa")
-            # print(prot)
-
         return {"status": archive_result.status_code,
                 "url": url}
 
@@ -228,6 +223,7 @@ def retrieve_by_sequence(sequence: str):
     protein = models.search(sequence, "Sequence")
     if protein is not None:
         return {
+            "status": 200,
             "pdb": protein.PDB,
             "sequence": protein.Sequence,
             "url": protein.URL
@@ -241,6 +237,7 @@ def retrieve_by_key(key: str):
     protein = models.search(key, "Key")
     if protein is not None:
         return {
+            "status": 200,
             "pdb": protein.PDB,
             "sequence": protein.Sequence,
             "url": protein.URL

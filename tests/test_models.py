@@ -40,7 +40,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_search_sequence(self):
         # test searching for a protein by sequence using the search function
-        print("test_search_sequence")
         seq = "SEARCHSEQ"
         pdb = "search_seq_pdb"
         url = "http://searchseq.com"
@@ -50,7 +49,6 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(result.Sequence, seq)
 
     def test_search_pdb(self):
-        print("test_search_pdb")
         # test searching for a protein by pdb using the search function
         seq = "SEARCHPDB"
         pdb = "search_pdb_pdb"
@@ -61,7 +59,6 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(result.PDB, pdb)
 
     def test_search_key(self):
-        print("test_search_key")
         key = '65c3cc07d603c8bb41f7a5d0'
 
         result = search(key, "Key")
@@ -69,7 +66,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_update_structure(self):
         # test updating structure in database
-        print("test_update_structure")
         seq = "update_me"
         pdb = "update_pdb"
         url = "http://update.com"
@@ -84,7 +80,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_delete_file_by_sequence(self):
         # test deleting a protein by sequence
-        print("test_delete_file_by_sequence")
         seq = "delete_me"
         pdb = "test_pdb"
         url = "http://example.com"
@@ -104,7 +99,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_delete_file_by_pdb(self):
         # test deleting a protein by pdb
-        print("test_delete_file_by_pdb")
         seq = "ABCDE"
         pdb = "test_delete_pdb"
         url = "http://example.com"
@@ -124,7 +118,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_delete_file_by_key(self):
         # test deleting a protein by key
-        print("test_delete_file_by_key")
         seq = "key_delete"
         pdb = "test_key_delete_pdb"
         url = "http://exampledelete.com"
@@ -147,7 +140,6 @@ class TestDatabase(unittest.TestCase):
 
     def test_write_to_database_new_protein(self):
         # test writing a completely new protein
-        print("test_write_to_database_new_protein")
         seq = "ABCDE"
         pdb = "new_pdb"
         url = "http://example.com"

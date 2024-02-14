@@ -53,12 +53,12 @@ def get_best_uniprot(id: str):
         return
 
     url_split = fetch_result["url"].split("/")
-    fetch_result, success = client.download("download_pdb", url_split[4:])
+    fetch_result, success = client.download("download_pdb", url_split[2:])
     if not success or "error" in str(fetch_result):
         print("PDB Download failure")
         return
 
-    with open("pdb" + pdb_id + ".ent", "wb") as f:
+    with open("pdb" + pdb_id.lower() + ".ent", "wb") as f:
         f.write(fetch_result)
     print("Download successful, saved as", "pdb" + pdb_id + ".ent")
 
@@ -66,6 +66,24 @@ def get_best_uniprot(id: str):
 def get(type: str, id: str):
     if type == "uniprot":
         get_best_uniprot(id)
+
+
+def store(file_path: str, pdb_id: str, sequence: str):
+    try:
+        with open(file_path, "r") as pdb_file:
+            byte_info = pdb_file.read()
+            result, success = client.post("store",
+                                          {
+                                              "pdb_id": pdb_id,
+                                              "sequence": sequence,
+                                              "file_content": byte_info})
+            if "success" in result and result["success"]:
+                print("Upload successful!")
+            else:
+                print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
+    except Exception:
+        print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
+        return False
 
 
 def help():
@@ -94,6 +112,15 @@ COMMANDS = {
             \nExample Usage: get uniprot P12319",
         get,
         2
+    ),
+    "store": Command(
+        "store",
+        "Usage \
+            \"store [file_path] [pdb_id] [sequence]\"\
+            \"\nUploads PDB file to server\
+            \nExample Usage: store pdbs/A123.ent A123 123123123123123123",
+        store,
+        3
     ),
     "exit": Command(
         "exit",

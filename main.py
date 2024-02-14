@@ -7,17 +7,14 @@ import uvicorn
 
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, Response
-import PSS_microservice.src.models 
+from fastapi.responses import FileResponse
 
-from PSS_microservice.src.models import ProteinCollection
-from db_operations import connect_to_mongodb, get_data_from_mongodb, SampleDocument
+from db_operations import connect_to_mongodb, get_data_from_mongodb
 from docker_operations import start_docker_container
 import json
 
 try:
     from PSS_microservice.src import uniprot_parser as uniprot_parser
-    from PSS_microservice.src import protein
 except ImportError:
     import src.uniprot_parser as uniprot_parser
     from src.protein import Protein
@@ -58,10 +55,10 @@ def calulate_score(protein: Protein) -> float:
     score = ((method_weight * method_score) +
              (coverage_weight * coverage_score) +
              (resolution_weight * float(resolution_score)))
-    
+
     if protein.is_alphafold:
         score -= ALPHAFOLD_PENALTY
-    
+
     return score
 
 
@@ -133,7 +130,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
         # sequence = pdb_sequences[pdb_id]
 
         # path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+        url = request.url_for("download_pdb", pdb_id=pdb_id)
 
         try:
             url = url._url
@@ -141,27 +138,26 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             # Some machines just return url directly
             pass
 
-    
-#below - what to be passed to models for the db
+
+# below - what to be passed to models for the db
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]
             path = os.getcwd() + "/" + pdb_id + "/" + file
-            request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
+            request.url_for("download_pdb", pdb_id=pdb_id)
             try:
                 url = url._url
             except AttributeError:
                 pass
 
             # TODO - get database links working on pipeline
-            
+
             # models.write_to_database(sequence, path, url)
 
-            #testing the find function; works
+            # testing the find function; works
             # prot = models.find("ramen")
             # print("aaaaaaaaa")
             # print(prot)
 
-        
         return {"status": archive_result.status_code,
                 "url": url}
 
@@ -193,7 +189,7 @@ def retrieve_by_sequence(sequence: str):
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
-    #find(key, field = key)
+    # find(key, field = key)
     return
 
 
@@ -202,6 +198,7 @@ def retrieve_by_key(key: str):
 def store_structure(key: str, structure: dict):
     protein_structures[key] = structure
     return {"message": "Structure stored"}
+
 
 def main():
     # Database configuration
@@ -214,8 +211,6 @@ def main():
 
     # Use Docker Compose to create a container and upload the data
     start_docker_container()
-
-
 
 
 if __name__ == '__main__':

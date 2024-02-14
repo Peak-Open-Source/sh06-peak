@@ -55,6 +55,21 @@ def get_by_key(key: str):
     print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
 
 
+def get_by_sequence(seq: str):
+    protein_info, success = client.get("retrieve_by_sequence", [seq])
+    if not success or protein_info["status"] == 404:
+        print("Retrieve by sequence failed - are you sure the sequence is valid?")  # noqa: E501
+    url_split = protein_info["url"].split("/")
+    fetch_result, success = client.download("download_pdb", url_split[2:])
+    if not success or "error" in str(protein_info):
+        print("PDB Download failure")
+        return
+
+    with open("pdb" + protein_info["pdb"].lower() + ".ent", "wb") as f:
+        f.write(fetch_result)
+    print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
+
+
 def get_best_uniprot(id: str):
     best_uniprot, success = client.get("retrieve_by_uniprot_id", [id])
     if not success:

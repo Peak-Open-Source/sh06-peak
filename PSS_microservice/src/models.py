@@ -6,6 +6,7 @@ class ProteinCollection(Document):
     Sequence = StringField(require=True)
     PDB = StringField(required=True)
     URL = StringField(required=True)
+    FileContent = StringField()
 
 
 def create_or_update(seq, pdb, url):

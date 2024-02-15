@@ -1,6 +1,9 @@
 from mongoengine import connect, Document, StringField, disconnect
 
-HOST_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
+LOCAL_URL = "mongodb://127.0.0.1:27017"
+WEB_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
+USE_LOCAL = True
+HOST_URL = LOCAL_URL if USE_LOCAL else WEB_URL
 
 
 # below; creates a new protein object

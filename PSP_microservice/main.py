@@ -45,20 +45,18 @@ def run_check():
             <h2>Endpoints:</h2>
             <ul>
                 <li><strong>Predict Protein Structure:</strong>
-                Endpoint to predict protein structure. <a href="/predict">
-                Go to endpoint</a></li>
+                Endpoint to predict protein structure. /predict
+                Go to endpoint</li>
                 <li><strong>Get Predicted Data:</strong>
-                Endpoint to retrieve predicted data.
-                <a href="/get_predicted/{qualifier}">Go to endpoint</a></li>
+                Endpoint to retrieve predicted data. /get_predicted/qualifier</li>
                 <li><strong>Get AlphaFold Sequence:</strong>
                 Endpoint to retrieve AlphaFold sequence.
-                <a href="/get_sequence/{qualifier}">Go to endpoint</a></li>
+                /get_sequence/qualifier</li>
                 <li><strong>Check Task Status:</strong>
-                Endpoint to check task status.
-                <a href="/task/{task_id}">Go to endpoint</a></li>
+                Endpoint to check task status. /task/task_id </li>
                 <li><strong>Show Structure:</strong>
                 Endpoint to show protein structure.
-                <a href="/showstruct/{qualifier}">Go to endpoint</a></li>
+                /showstruct/qualifier </li>
             </ul>
         </body>
     </html>

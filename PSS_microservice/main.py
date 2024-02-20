@@ -84,7 +84,7 @@ class UploadInformation(BaseModel):
         one is created - otherwise, the existing folder is wiped before
         the new file is saved.
         """
-        
+
         self.pdb_id = self.pdb_id.lower()
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
         if not os.path.exists(folder_path):

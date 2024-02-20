@@ -13,6 +13,8 @@ All workloads of the application must run as containers, originally in Docker ho
 
 The application should be accessed via REST API or a python script/compiled binary
 
+## Setup
+Run command "pip install -r requirements.txt" in order to install all python dependencies
 
 ## Useful Commands
 

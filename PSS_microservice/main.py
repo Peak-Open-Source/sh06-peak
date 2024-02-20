@@ -175,13 +175,15 @@ pdb_sequences = {}
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
+def retrieve_by_uniprot_id(uniprot_id: str, noCache: bool = False):
     if not noCache and uniprot_id in best_structures:
-        return {'structure': best_structures[uniprot_id],
-                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]
-                if best_structures[uniprot_id]["id"] in pdb_sequences
-                else "SequenceNotFound"
-                }
+        return {
+            'status': 200,
+            'structure': best_structures[uniprot_id],
+            'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]
+            if best_structures[uniprot_id]["id"] in pdb_sequences
+            else "SequenceNotFound"
+            }
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]
@@ -193,11 +195,17 @@ def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
             return {"error": "No valid structure found"}
         best_structures[uniprot_id] = best_structure
         pdb_sequences[best_structure["id"].lower()] = sequence
-        return {'structure': best_structure,
-                'sequence': sequence}
+        return {
+            'status': 200,
+            'structure': best_structure,
+            'sequence': sequence
+        }
     else:
-        return {"error": "Failed to resolve valid references",
-                "data": raw_uniprot_data}
+        return {
+                "status": 404,
+                "error": "Failed to resolve valid references",
+                "data": raw_uniprot_data
+        }
 
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
@@ -246,7 +254,7 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
 
 @app.get("/download_pdb/{pdb_id}")
-def download_pdb(pdb_id):
+def download_pdb(pdb_id: str):
     existing_collection = models.search(pdb_id, "PDB")
     file_name = "pdb" + pdb_id.lower() + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
@@ -297,7 +305,7 @@ def retrieve_by_key(key: str):
 def store_structure(upload_information: UploadInformation):
     protein_structures[upload_information.pdb_id] = upload_information
     success = upload_information.store()
-    return {"success": success}
+    return {"success": success, "status": 400 if not success else 200}
 
 
 def main():

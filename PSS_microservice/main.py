@@ -26,18 +26,65 @@ ALPHAFOLD_PENALTY = .1
 
 
 class UploadInformation(BaseModel):
+
+    """
+    A class used to represent the uploaded file contents of a
+    PDB file that the user has chosen to edit/upload. This class
+    can be used to control the corresponding server-side
+    files for the uploaded PDB.
+
+    Attributes
+    ----------
+
+    pdb_id : str
+        The Protein Data Bank ID of the uploaded protein file. This is
+        a unique identifier.
+    sequence : str
+        The protein structure sequence of the uploaded protein file.
+    file_content : str
+        The full text contents of the uploaded protein file. Stored so
+        that the file can be dynamically recreated on the server even
+        after restart.
+
+    Methods
+    -------
+
+    clean() -> None:
+        Destroys any existing folder that contains information with the
+        same PDB ID.
+
+    store() -> None:
+        Creates a new .ent file containing the contents of the uploaded
+        PDB file. If a corresponding folder for the PDB ID does not exist,
+        one is created - otherwise, the existing folder is wiped before
+        the new file is saved.
+
+    """
+
     pdb_id: str
     sequence: str
     file_content: str
 
-    def clean(self):
+    def clean(self) -> None:
+        """
+        Destroys any existing folder that contains information with the
+        same PDB ID.
+        """
+
         self.pdb_id = self.pdb_id.lower()
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
         for file_name in [f for f in os.listdir(folder_path)
                           if f != "contains.txt"]:
             os.remove(folder_path + "/" + file_name)
 
-    def store(self):
+    def store(self) -> None:
+        """
+        Creates a new .ent file containing the contents of the uploaded
+        PDB file. If a corresponding folder for the PDB ID does not exist,
+        one is created - otherwise, the existing folder is wiped before
+        the new file is saved.
+        """
+        
         self.pdb_id = self.pdb_id.lower()
         folder_path = f"{os.getcwd()}/{self.pdb_id}"
         if not os.path.exists(folder_path):

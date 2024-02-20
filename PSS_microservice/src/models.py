@@ -38,7 +38,7 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
     entries or writes new entries to the database.
 
     :param seq: The `seq` parameter is a string representing the sequence of a
-                protein. It could be asequence of amino acids or nucleotides,
+                protein. It could be a sequence of amino acids or nucleotides,
                 depending on the context
     :param pdb: The parameter "pdb" is a string that represents the Protein
                 Data Bank (PDB) code for a protein. The PDB code is a unique

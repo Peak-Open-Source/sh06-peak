@@ -1,7 +1,9 @@
 import sys
+import os
 
 from PSSClient import PSSClient
 
+print("CWD:", os.getcwd())
 ip = (input("Please enter the IP of the PSS Microservice, \
            for example http://localhost (not the port!): ")
       if len(sys.argv) < 3 else sys.argv[1])
@@ -38,6 +40,36 @@ class Command():
         print(f"{self.name}\n{self.description}")
 
 
+def get_by_key(key: str):
+    protein_info, success = client.get("retrieve_by_key", [key])
+    if not success or protein_info["status"] == 404:
+        print("Retrieve by key failed - are you sure the key is valid?")
+    url_split = protein_info["url"].split("/")
+    fetch_result, success = client.download("download_pdb", url_split[2:])
+    if not success or "error" in str(protein_info):
+        print("PDB Download failure")
+        return
+
+    with open("pdb" + protein_info["pdb"].lower() + ".ent", "wb") as f:
+        f.write(fetch_result)
+    print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
+
+
+def get_by_sequence(seq: str):
+    protein_info, success = client.get("retrieve_by_sequence", [seq])
+    if not success or protein_info["status"] == 404:
+        print("Retrieve by sequence failed - are you sure the sequence is valid?")  # noqa: E501
+    url_split = protein_info["url"].split("/")
+    fetch_result, success = client.download("download_pdb", url_split[2:])
+    if not success or "error" in str(protein_info):
+        print("PDB Download failure")
+        return
+
+    with open("pdb" + protein_info["pdb"].lower() + ".ent", "wb") as f:
+        f.write(fetch_result)
+    print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
+
+
 def get_best_uniprot(id: str):
     best_uniprot, success = client.get("retrieve_by_uniprot_id", [id])
     if not success:
@@ -66,6 +98,10 @@ def get_best_uniprot(id: str):
 def get(type: str, id: str):
     if type == "uniprot":
         get_best_uniprot(id)
+    elif type == "key":
+        get_by_key(id)
+    elif type == "sequence":
+        get_by_sequence(id)
 
 
 def store(file_path: str, pdb_id: str, sequence: str):
@@ -108,7 +144,8 @@ COMMANDS = {
         "get",
         "Usage \
             \"get [database_type] [id]\"\
-            \"\nFetches and downloads best PDB from appropriate database.\
+            \nFetches and downloads best PDB from appropriate database.\
+            \nValid database_type: uniprot, key, sequence\
             \nExample Usage: get uniprot P12319",
         get,
         2

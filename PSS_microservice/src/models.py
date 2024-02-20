@@ -1,16 +1,17 @@
+from mongoengine import connect, Document, StringField, disconnect
 
-from mongoengine import connect, Document, StringField, disconnect, DictField
+HOST_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
 
 
-# The `ProteinCollection` class represents a collection of proteins and stores their sequence, PDB
-# code, and URL.
+# below; creates a new protein object
 class ProteinCollection(Document):
     Sequence = StringField(require=True)
     PDB = StringField(required=True)
     URL = StringField(required=True)
+    FileContent = StringField(required=True)
 
 
-def create_or_update(seq, pdb, url):
+def create_or_update(seq, pdb, url, file_content):
     """
     The function `create_or_update` connects to a MongoDB database, checks if a collection with a given
     PDB exists, and either updates the existing entries or writes new entries to the database.
@@ -22,20 +23,21 @@ def create_or_update(seq, pdb, url):
     database
     :param url: The `url` parameter is a string that represents the URL of the protein sequence
     """
-    connect('ProteinDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+
+    connect('ProteinDatabase', host=HOST_URL)
     collection = ProteinCollection.objects(PDB=pdb)
     if collection.count() > 0:
         for entry in collection:
             entry.PDB = pdb
             entry.Sequence = seq
             entry.URL = url
+            entry.FileContent = file_content
             entry.save()
     else:
-        write_to_database(seq, pdb, url)
+        write_to_database(seq, pdb, url, file_content)
 
 
-
-def write_to_database(seq, pdb, url):
+def write_to_database(seq, pdb, url, file_content):
     """
     The function `write_to_database` writes protein sequence, PDB ID, and URL to a MongoDB database,
     checking for existing entries and updating if necessary.
@@ -49,9 +51,9 @@ def write_to_database(seq, pdb, url):
     URL of the protein structure. It is used to store the URL in the database along with the sequence
     and PDB code of the protein
     """
+
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
 
         seq_query = ProteinCollection.objects(Sequence=seq)
         pdb_query = ProteinCollection.objects(PDB=pdb)
@@ -67,13 +69,15 @@ def write_to_database(seq, pdb, url):
         elif not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
             # check if already exists;
             print("successful")
-            ProteinCollection(Sequence=seq, PDB=pdb, URL=url).save()
+            ProteinCollection(Sequence=seq,
+                              PDB=pdb,
+                              URL=url,
+                              FileContent=file_content).save()
 
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         disconnect()
-
 
 
 def search(to_find, field):
@@ -88,23 +92,24 @@ def search(to_find, field):
     :return: the document that matches the search criteria specified by the "to_find" and "field"
     parameters.
     """
+
     try:
-        connect('ProteinDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)  # noqa:E501
         if field == "Sequence":
-            document = ProteinCollection.objects.get(Sequence=to_find)
+            document = ProteinCollection.objects(Sequence=to_find).first()
             return (document)
         elif field == "PDB":
-            document = ProteinCollection.objects.get(PDB=to_find)
+            to_find = to_find.lower()
+            document = ProteinCollection.objects(PDB=to_find).first()
             return (document)
         elif field == "Key":
-            document = ProteinCollection.objects.get(id=to_find)
+            document = ProteinCollection.objects(id=to_find).first()
             return (document)
 
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         disconnect()
-
 
 
 def update_structure(id_to_find, new_structure):
@@ -118,9 +123,9 @@ def update_structure(id_to_find, new_structure):
     the new structure or any other data type that you want to store as the new value for the "PDB" field
     in the
     """
+
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_structure
         document.save()
@@ -128,7 +133,6 @@ def update_structure(id_to_find, new_structure):
         print(f"An error occurred: {e}")
     finally:
         disconnect()
-
 
 
 def delete_file(to_delete, field):
@@ -142,9 +146,10 @@ def delete_file(to_delete, field):
     :param field: The "field" parameter is used to specify the field based on which the document should
     be deleted. It can have three possible values: "Sequence", "PDB", or "Key"
     """
+
     try:
-        connect('ProteinDatabase',
-                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', host=HOST_URL)
+        # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_delete)
         elif field == "PDB":
@@ -159,6 +164,14 @@ def delete_file(to_delete, field):
         disconnect()
 
 
+# my little weeny tests; all working as intended
 
-# & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"
+# delete_file("pdbdoc","PDB")
+# write_to_database("accatgagatsgstaaga","clobbering","wikipedia.com")
+# update_file('65afbb69f6a68a6a4e715d57', "1F6B")
+# doc_to_find = search("17fa" ,"PDB")
+# print(doc_to_find)
+# connect info:
+
+# & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"   # noqa:E501
 # python sh06-main/cli/__main__.py get uniprot P12319

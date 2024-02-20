@@ -110,8 +110,8 @@ class Protein:
     def is_alphafold(self):
         return self._is_alphafold
 
-    @method.setter
-    def is_alphafold(self, val: bool):  # noqa:F811 TODO
+    @is_alphafold.setter
+    def is_alphafold(self, val: bool):
         self._is_alphafold = val
 
     @method.setter

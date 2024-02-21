@@ -5,14 +5,12 @@ import requests
 import numpy as np
 
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import src.models as models  # noqa:F401
 
-from src.db_operations import connect_to_mongodb, get_data_from_mongodb
 from src.db_operations import SampleDocument  # noqa:F401
-from src.docker_operations import start_docker_container
 
 
 try:
@@ -22,6 +20,7 @@ except ImportError:
     import src.uniprot_parser as uniprot_parser
     from src.protein import Protein
 
+# Additional penalty applied to AlphaFold entries to make them chosen less
 ALPHAFOLD_PENALTY = .1
 
 
@@ -114,11 +113,31 @@ protein_structures = {}
 # function to check your app is running :)
 @app.get("/")
 def run_check():
+    """
+    Default return when no endpoint is called
+    """
+    # TODO: Make this return something useful
     return {"message": "running! :)"}
 
 
 # helper function to score proteins
 def calulate_score(protein: Protein) -> float:
+    """
+    Calculates a complete weighting for a specified protein.
+    Takes into account each factor of the protein:
+    method, resolution, coverage
+    and creates a final float value for comparison.
+
+    Parameters
+    ----------
+    protein : Protein
+        The Protein object that the score should be calculated
+        for.
+
+    Returns
+    -------
+    float : The final result score for the specified protein.
+    """
     # method weightings provided by client
     # X-ray > NMR ≈ EM > Predicted (ignore other)
     method_weights = {"X-ray": 4, "NMR": 3, "EM": 2,
@@ -149,6 +168,20 @@ def calulate_score(protein: Protein) -> float:
 # Helper function to select the best structure
 # based on the weightings given by client
 def select_best_structure(structures: list[Protein]) -> dict:
+    """
+    Takes in a list of Proteins, calculates the score for
+    each Protein in the list, and then returns the Protein
+    with the highest score as a dictionary.
+
+    Parameters
+    ----------
+    structures : list[Protein]
+        The list of all protein structures to be compared.
+
+    Returns
+    -------
+    dict : The dictionary version of the best calculated protein.
+    """
     if not structures or len(structures) == 0:
         return None
 
@@ -161,22 +194,34 @@ def select_best_structure(structures: list[Protein]) -> dict:
     return best_protein.as_dict()
 
 
-# Helper function to find matching structures by sequence
-def find_matching_structures(sequence: str):
-    # Implement logic to search for exact matches stored in database
-    matches = [structure for structure in protein_structures.values()
-               if structure['sequence'] == sequence]
-    return matches
-
-
 best_structures = {}
 pdb_sequences = {}
-# Endpoint to retrieve protein structures by Uniprot ID
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id: str, noCache: bool = False):
-    if not noCache and uniprot_id in best_structures:
+def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False):
+    """
+    With a given Uniprot ID, gathers all PDB information from
+    the Uniprot DB, and then calculates the best one from
+    each PDB. If the specified ID has already been calculated,
+    the cached result will be returned.
+
+    Parameters
+    ----------
+    uniprot_id : str
+        The specified Uniprot ID that the user wants to find the
+        best PDB for.
+    no_cache : bool?
+        An optional flag that dictates whether or not the returned
+        protein should be the cached result or not.
+
+    Returns
+    -------
+    dict : A dictionary that contains the result of the request,
+           including whether or not it failed and any corresponding
+           data.
+    """
+    if not no_cache and uniprot_id in best_structures:
         return {
             'status': 200,
             'structure': best_structures[uniprot_id],
@@ -209,7 +254,22 @@ def retrieve_by_uniprot_id(uniprot_id: str, noCache: bool = False):
 
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
-def fetch_pdb_by_id(request: Request, pdb_id):
+def fetch_pdb_by_id(pdb_id: str):
+    """
+    Downloads the corresponding PDB file from the EBI API onto
+    the server to be later served to the user.
+
+    Parameters
+    ----------
+    pdb_id : str
+        The ID of the PDB to be downloaded on the server.
+
+    Returns
+    -------
+    dict : A dictionary containing the result of the request,
+           along with the corresponding download URL for the
+           fetched PDB file.
+    """
     pdb_id = pdb_id.lower()
     archive_url = ("https://www.ebi.ac.uk/pdbe/download/api/pdb"
                    f"/entry/archive?data_format=pdb&id={pdb_id}")
@@ -255,6 +315,20 @@ def fetch_pdb_by_id(request: Request, pdb_id):
 
 @app.get("/download_pdb/{pdb_id}")
 def download_pdb(pdb_id: str):
+    """
+    Allows users to download a stored PDB file to their
+    local machine. If the file does not exist on the server,
+    it is created using the contents of the database.
+
+    Parameters
+    ----------
+    pdb_id : str
+        The ID of the PDB file to be downloaded from the server.
+
+    Returns
+    -------
+    File : Returns all file information for the specified PDB ID.
+    """
     existing_collection = models.search(pdb_id, "PDB")
     file_name = "pdb" + pdb_id.lower() + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
@@ -275,6 +349,21 @@ def download_pdb(pdb_id: str):
 # Endpoint to retrieve protein structures by sequence
 @app.get('/retrieve_by_sequence/{sequence}')
 def retrieve_by_sequence(sequence: str):
+    """
+    Retrieves the protein database information for a protein entry
+    with the specified sequence.
+
+    Parameters
+    ----------
+    sequence : str
+        The protein sequence to be searched for within the database.
+
+    Returns
+    -------
+    dict : A dictionary containing the results of the request, alongside
+           the corresponding protein's information if found within the
+           database.
+    """
     protein = models.search(sequence, "Sequence")
     if protein is not None:
         return {
@@ -289,6 +378,21 @@ def retrieve_by_sequence(sequence: str):
 # Endpoint to retrieve sequence structures by key
 @app.get('/retrieve_by_key/{key}')
 def retrieve_by_key(key: str):
+    """
+    Retrieves the protein database information for a protein entry
+    with the specified primary key.
+
+    Parameters
+    ----------
+    key : str
+        The primary key to be searched for within the database.
+
+    Returns
+    -------
+    dict : A dictionary containing the results of the request, alongside
+           the corresponding protein's information if found within the
+           database.
+    """
     protein = models.search(key, "Key")
     if protein is not None:
         return {
@@ -303,26 +407,25 @@ def retrieve_by_key(key: str):
 # Endpoint to store protein structures
 @app.post('/store')
 def store_structure(upload_information: UploadInformation):
+    """
+    Stores an uploaded PDB file's information by instantiating it
+    on the server and storing it in the database. If a PDB with the
+    specified ID already exists, it is updated.
+
+    Parameters
+    ----------
+    upload_information : UploadInformation
+        The JSON POST information on all of the file contents, including
+        PDB ID, sequence, and the contents of the file.
+
+    Returns
+    -------
+    dict : A dictionary returning whether the file was succesffuly stored
+           or not.
+    """
     protein_structures[upload_information.pdb_id] = upload_information
     success = upload_information.store()
     return {"success": success, "status": 400 if not success else 200}
-
-
-def main():
-    # Database configuration
-    database_name = 'your_database_name'
-    mongodb_uri = 'your_mongodb_uri'
-    connect_to_mongodb(database_name, mongodb_uri)
-
-    # Retrieve data from the MongoDB database
-    data_from_mongo = get_data_from_mongodb()
-
-    # Write the data to a JSON file
-    with open('mongodb_data.json', 'w') as json_file:
-        json_file.write(data_from_mongo)
-
-    # Use Docker Compose to create a container and upload the data
-    start_docker_container()
 
 
 if __name__ == '__main__':

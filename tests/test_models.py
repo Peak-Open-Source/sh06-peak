@@ -1,9 +1,9 @@
 import unittest
 from mongoengine import *
-from pymongo import *
 import sys
+from models import write_to_database, update_structure, search, delete_file, ProteinCollection  # noqa:E501
+
 sys.path.insert(1, 'PSS_microservice/src')
-from models import write_to_database, update_structure, search, delete_file, ProteinCollection
 
 
 class TestDatabase(unittest.TestCase):
@@ -43,10 +43,12 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "new_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         # check if the protein is stored in the database
-        result = ProteinCollection.objects.get(Sequence=seq, PDB=pdb, URL=url)
+        result = ProteinCollection.objects.get(Sequence=seq, PDB=pdb, URL=url,
+                                               FileContents=contents)
         self.assertIsNotNone(result)
 
     def test_search_sequence(self):
@@ -54,7 +56,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         result = search(seq, "Sequence")
         self.assertEqual(result.Sequence, seq)
@@ -64,7 +67,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         result = search(pdb, "PDB")
         self.assertEqual(result.PDB, pdb)
@@ -74,7 +78,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
         key = "4794879338795489"
 
         result = search(key, "Key")
@@ -85,7 +90,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         new_structure = "new_test_pdb"
         id_to_find = ProteinCollection.objects.get(Sequence=seq).id
@@ -99,7 +105,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         delete_file(seq, "Sequence")
 
@@ -117,7 +124,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
 
         delete_file(pdb, "PDB")
 
@@ -135,7 +143,8 @@ class TestDatabase(unittest.TestCase):
         seq = "ABCDE"
         pdb = "test_pdb"
         url = "http://example.com"
-        write_to_database(seq, pdb, url)
+        contents = "test"
+        write_to_database(seq, pdb, url, contents)
         key = ProteinCollection.objects.get(Sequence=seq).id
 
         delete_file(key, "Key")

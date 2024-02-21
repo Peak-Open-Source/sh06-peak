@@ -18,6 +18,31 @@ running = True
 
 
 class Command():
+    """
+    A class used to represent and control each individual
+    command in the CLI, along with any relevant information.
+
+    Attributes
+    ----------
+    name : str
+        The name of the command.
+    description : str
+        The description of the command, detailing how to use and what it does.
+    number_of_args : int
+        The number of arguments to be passed into the command's function
+    method : func
+        The method to be called when running the command.
+
+    Methods
+    -------
+
+    Command(name: str, description: str, func: func, num_args: int?):
+        Constructor for the class, taking all attributes as parameters.
+
+    print():
+        Prints the name and description of the command in an easy to
+        read format.
+    """
     def __init__(self, name: str, description: str, func, num_args: int = 0):
         self._name = name
         self._description = description

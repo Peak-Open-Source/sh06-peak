@@ -1,12 +1,10 @@
-import unittest
+import pytest
 from mongoengine import *
 from pymongo import *
-import sys
-sys.path.insert(1, 'PSS_microservice/src')
-from models import write_to_database, update_structure, search, delete_file, ProteinCollection
+from PSS_microservice.src.models import *
 
 
-class TestDatabase(unittest.TestCase):
+# class TestDatabase():
 
     # def setUp(self):
     #     # Connect to the test database
@@ -37,9 +35,11 @@ class TestDatabase(unittest.TestCase):
     #     # check if the protein is updated in the database
     #     result = ProteinCollection.objects.get(PDB=pdb)
     #     self.assertEqual(result.Sequence, seq)
+    
+def test_models():
+      print("passed")
 
-
-    def test_search_sequence(self):
+def test_search_sequence():
         # test searching for a protein by sequence using the search function
         seq = "SEARCHSEQ"
         pdb = "search_seq_pdb"
@@ -47,9 +47,9 @@ class TestDatabase(unittest.TestCase):
         write_to_database(seq, pdb, url)
 
         result = search(seq, "Sequence")
-        self.assertEqual(result.Sequence, seq)
+        assert result.Sequence == seq, "Protein successfully found by sequence"
 
-    def test_search_pdb(self):
+def test_search_pdb():
         # test searching for a protein by pdb using the search function
         seq = "SEARCHPDB"
         pdb = "search_pdb_pdb"
@@ -57,16 +57,16 @@ class TestDatabase(unittest.TestCase):
         write_to_database(seq, pdb, url)
 
         result = search(pdb, "PDB")
-        self.assertEqual(result.PDB, pdb)
+        assert result.PDB == pdb, "Protein successfully found by pdb"
 
-    def test_search_key(self):
+def test_search_key():
 
         key = '65c3cc07d603c8bb41f7a5d0'
 
         result = search(key, "Key")
-        self.assertEqual(str(result.id), key)
+        assert str(result.id) == key, "Protein successfully found by key"
 
-    def test_update_structure(self):
+def test_update_structure():
         # test updating structure in database
         seq = "update_me"
         pdb = "update_pdb"
@@ -78,9 +78,9 @@ class TestDatabase(unittest.TestCase):
         update_structure(id_to_find, new_structure)
 
         result = search(seq, "Sequence")
-        self.assertEqual(result.PDB, new_structure)
+        assert result.PDB == new_structure, "Protein structure successfully updated in database"
 
-    def test_delete_file_by_sequence(self):
+def test_delete_file_by_sequence():
         # test deleting a protein by sequence
         seq = "delete_me"
         pdb = "test_pdb"
@@ -96,9 +96,9 @@ class TestDatabase(unittest.TestCase):
         except DoesNotExist:
             result = None
 
-        self.assertIsNone(result)
+        assert result == None, "Protein successfully deleted from database"
 
-    def test_delete_file_by_pdb(self):
+def test_delete_file_by_pdb():
         # test deleting a protein by pdb
         seq = "ABCDE"
         pdb = "test_delete_pdb"
@@ -114,9 +114,9 @@ class TestDatabase(unittest.TestCase):
         except DoesNotExist:
             result = None
 
-        self.assertIsNone(result)
+        assert result == None, "Protein successfully deleted from database"
 
-    def test_delete_file_by_key(self):
+def test_delete_file_by_key():
         # test deleting a protein by key
         seq = "key_delete"
         pdb = "test_key_delete_pdb"
@@ -127,7 +127,6 @@ class TestDatabase(unittest.TestCase):
         key = ProteinCollection.objects.get(Sequence=seq).id
         disconnect()
 
-
         delete_file(key, "Key")
 
         # check if protein is deleted from the database
@@ -137,19 +136,15 @@ class TestDatabase(unittest.TestCase):
         except DoesNotExist:
             result = None
 
-        self.assertIsNone(result)
+        assert result == None, "Protein successfully deleted from database"
 
-    def test_write_to_database_new_protein(self):
+def test_write_to_database_new_protein():
         # test writing a completely new protein
         seq = "ABCDE"
         pdb = "new_pdb"
         url = "http://example.com"
         write_to_database(seq, pdb, url)
 
-        # check if the protein is stored in the database    
+        # check if the protein is stored in the database
         result = search(seq, "Sequence")
-        self.assertIsNotNone(result)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert result != None, "Protein successfully stored in database"

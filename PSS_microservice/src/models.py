@@ -1,6 +1,11 @@
 from mongoengine import connect, Document, StringField, disconnect
 
-HOST_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
+LOCAL_URL = "mongodb://127.0.0.1:27017"
+WEB_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
+USE_LOCAL = False
+HOST_URL = LOCAL_URL if USE_LOCAL else WEB_URL
+
+DATABASE_NAME = "ProteinCollection"
 
 
 class ProteinCollection(Document):
@@ -92,7 +97,7 @@ def write_to_database(seq: str, pdb: str, url: str, file_content: str) -> None:
     """
 
     try:
-        connect('ProteinDatabase', host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL)
 
         seq_query = ProteinCollection.objects(Sequence=seq)
         pdb_query = ProteinCollection.objects(PDB=pdb)
@@ -144,7 +149,7 @@ def search(to_find: str, field: str) -> ProteinCollection:
     """
 
     try:
-        connect('ProteinDatabase', host=HOST_URL)  # noqa:E501
+        connect(DATABASE_NAME, host=HOST_URL)  # noqa:E501
         if field == "Sequence":
             document = ProteinCollection.objects(Sequence=to_find).first()
             return (document)
@@ -178,7 +183,7 @@ def update_structure(id_to_find: str, new_pdb: str) -> None:
     """
 
     try:
-        connect('ProteinDatabase', host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL)
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_pdb
         document.save()
@@ -208,7 +213,7 @@ def delete_file(to_delete: str, field: str) -> None:
     """
 
     try:
-        connect('ProteinDatabase', host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL)
         # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_delete)

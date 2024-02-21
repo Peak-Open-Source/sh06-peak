@@ -16,7 +16,7 @@ celery = Celery('tasks')
 celery.config_from_object('celery_config')
 
 """
-App to retrive and request predictions from alphafold
+App to retrieve and request predictions from alphafold
 """
 
 

@@ -2,7 +2,7 @@ import pytest
 from mongoengine import DoesNotExist, connect, disconnect
 import sys
 sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501
+from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
 
 
 # class TestDatabase():
@@ -102,7 +102,7 @@ def test_delete_file_by_sequence():
     except DoesNotExist:
         result = None
 
-    assert result == None, "Protein unsuccessfully deleted from database"
+    assert result is None, "Protein unsuccessfully deleted from database"
 
 
 def test_delete_file_by_pdb():

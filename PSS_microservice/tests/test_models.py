@@ -1,7 +1,8 @@
-import unittest
-from mongoengine import connect, disconnect, DoesNotExist
+import pytest
+from mongoengine import DoesNotExist, connect, disconnect
 import sys
-from models import write_to_database, update_structure, search, delete_file, ProteinCollection  # noqa:E501
+sys.path.append("PSS_microservice/")
+from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501
 
 sys.path.insert(1, 'PSS_microservice/src')
 
@@ -50,7 +51,8 @@ def test_search_sequence():
     write_to_database(seq, pdb, url)
 
     result = search(seq, "Sequence")
-    assert result.Sequence == seq, "Protein successfully found by sequence"
+
+    assert result.Sequence == seq, "Protein unsuccessfully found by sequence"
 
 
 def test_search_pdb():
@@ -61,14 +63,14 @@ def test_search_pdb():
     write_to_database(seq, pdb, url)
 
     result = search(pdb, "PDB")
-    assert result.PDB == pdb, "Protein successfully found by pdb"
+    assert result.PDB == pdb, "Protein unsuccessfully found by pdb"
 
 
 def test_search_key(self):
     key = '65c3cc07d603c8bb41f7a5d0'
 
     result = search(key, "Key")
-    assert str(result.id) == key, "Protein successfully found by key"
+    assert str(result.id) == key, "Protein unsuccessfully found by key"
 
 
 def test_update_structure():
@@ -83,7 +85,7 @@ def test_update_structure():
     update_structure(id_to_find, new_structure)
 
     result = search(seq, "Sequence")
-    assert result.PDB == new_structure, "Protein structure successfully updated in database"  # noqa:E501
+    assert result.PDB == new_structure, "Protein structure unsuccessfully updated in database"  # noqa: E501
 
 
 def test_delete_file_by_sequence():
@@ -91,8 +93,7 @@ def test_delete_file_by_sequence():
     seq = "delete_me"
     pdb = "test_pdb"
     url = "http://example.com"
-    contents = "test"
-    write_to_database(seq, pdb, url, contents)
+    write_to_database(seq, pdb, url)
 
     delete_file(seq, "Sequence")
 
@@ -103,7 +104,7 @@ def test_delete_file_by_sequence():
     except DoesNotExist:
         result = None
 
-    assert result is None, "Protein successfully deleted from database"
+    assert result is None, "Protein unsuccessfully deleted from database"
 
 
 def test_delete_file_by_pdb():
@@ -111,8 +112,7 @@ def test_delete_file_by_pdb():
     seq = "ABCDE"
     pdb = "test_delete_pdb"
     url = "http://example.com"
-    contents = "test"
-    write_to_database(seq, pdb, url, contents)
+    write_to_database(seq, pdb, url)
 
     delete_file(pdb, "PDB")
 
@@ -123,7 +123,7 @@ def test_delete_file_by_pdb():
     except DoesNotExist:
         result = None
 
-    assert result is None, "Protein successfully deleted from database"
+    assert result is None, "Protein unsuccessfully deleted from database"
 
 
 def test_delete_file_by_key():
@@ -146,7 +146,7 @@ def test_delete_file_by_key():
     except DoesNotExist:
         result = None
 
-    assert result is None, "Protein successfully deleted from database"
+    assert result is None, "Protein unsuccessfully deleted from database"
 
 
 def test_write_to_database_new_protein():
@@ -158,4 +158,5 @@ def test_write_to_database_new_protein():
 
     # check if the protein is stored in the database
     result = search(seq, "Sequence")
-    assert result is not None, "Protein successfully stored in database"
+
+    assert result is not None, "Protein unsuccessfully stored in database"

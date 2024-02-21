@@ -44,7 +44,7 @@ class TestProtein():
         test_protein.add_coverage(630, 650)
         test_protein.add_coverage(20, 50)
         test_protein.merge_coverages()
-        test_protein.calculate_coverages() == 50
+        assert test_protein.calculate_coverages() == 50
 
     def test_overlap_quad_merge(self):
         test_protein = Protein("1X")
@@ -61,7 +61,7 @@ class TestProtein():
         test_protein.add_coverage(615, 640)
         test_protein.add_coverage(20, 50)
         test_protein.merge_coverages()
-        test_protein.calculate_coverages() == 65
+        assert test_protein.calculate_coverages() == 65
 
 
 class TestClient():

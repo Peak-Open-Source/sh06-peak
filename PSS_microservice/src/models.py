@@ -67,6 +67,7 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
             entry.URL = url
             entry.FileContent = file_content
             entry.save()
+        disconnect()
     else:
         write_to_database(seq, pdb, url, file_content)
 

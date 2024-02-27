@@ -35,9 +35,13 @@ pytest --cov-report term-missing --cov=PSS_microservice
 ### Docker Build
 
 Both the PSS and MongoDB images can be built together using Docker Compose.
+
 Make sure Docker Compose is installed on your machine, and then run this command to build and start the microservice:
+
 docker compose up
+
 This command will run any existing build if one exists - to avoid this, ammend --build to the end of the command and force a build.
+
 Any edits to the build process should be made in either the Dockerfile or docker-compose.yml file inside the PSS Microservice.
 
 ## Project File Structure

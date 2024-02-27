@@ -292,6 +292,7 @@ def fetch_pdb_by_id(pdb_id: str):
 
 
 # below - what to be passed to models for the db
+        print("PASS INITIAL")
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]  # noqa:F841
 
@@ -303,7 +304,9 @@ def fetch_pdb_by_id(pdb_id: str):
             with open(path) as f:
                 file_content = f.read()
 
+            print("FILE READ DONE")
             models.create_or_update(sequence, pdb_id, url, file_content)
+            print("MODEL CREATED?")
 
         return {"status": archive_result.status_code,
                 "url": url}

@@ -32,48 +32,13 @@ pytest --cov-report term-missing --cov=PSS_microservice
 
 ## How To Guide
 
-### MongoDB to Docker
+### Docker Build
 
-To run the MongoDB file in Docker and store it in Docker, run the following commands:
-
-line 1: docker run -t mongo 
-
-line 2: docker images (just to check if mongo image is stored)
-
-line 3: docker run mongodb 
-
-line 4: docker ps (checks if the mongo is running in the container - should come up with information of container)
-
-line 5: docker exec -it (containerID) (full directory of files from which we afer running the docker container (e.g /data/db))
-
-After these, the terminal should take us into a test directory and by running the following command:
-
-line 6: show collections 
-
-shows all the JSON information we have.
-
-OR:
-
-line 1: docker run -t mongo
-
-line 2: docker pull mongo:latest
-
-line 3: docker run mongo
-
-line 4: make new directory (mkdir (newDirectory)
-
-Inside the new directory
-
-docker run -d -p 2717:27017 -v ~/data/db --name (mymongo) mongo
-
-check if container is made by running (docker ps - should output a container ID)
-
-line 5: winpty docker exec -it mymongo bash (should take us inside container.
-
-line 6: run mongo in the container
-(Should take us into a local directory called test)
-
-line 7: show dbs (will show all databases inside directory)
+Both the PSS and MongoDB images can be built together using Docker Compose.
+Make sure Docker Compose is installed on your machine, and then run this command to build and start the microservice:
+docker compose up
+This command will run any existing build if one exists - to avoid this, ammend --build to the end of the command and force a build.
+Any edits to the build process should be made in either the Dockerfile or docker-compose.yml file inside the PSS Microservice.
 
 ## Project File Structure
 

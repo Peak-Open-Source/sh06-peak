@@ -247,6 +247,17 @@ COMMANDS = {
 
 
 def get_command(command_args):
+    """
+    Takes a list of command arguments, finds the corresponding command value,
+    and then runs the command with the remaining arguments.
+
+    Parameters
+    ----------
+
+    command_args : list[str]
+        A list of all arguments to be used for the command. The first argument
+        is the alias of the command being executed.
+    """
     target = command_args[0]
     if target in COMMANDS:
         command = COMMANDS[target]
@@ -255,6 +266,16 @@ def get_command(command_args):
 
 
 def process(command):
+    """
+    Wrapper method to provide validation and error handling
+    to user-inputted commands.
+
+    Parameters
+    ----------
+
+    command : list[str]
+        A list of all arguments to be used for command logic.
+    """
     if len(command) < 1:
         help()
     else:
@@ -266,6 +287,7 @@ def process(command):
                   and that the Microservice is online.")
 
 
+# The CLI can be ran from the commmand line, so need to handle sysargs.
 if len(sys.argv) >= 3:
     host = sys.argv[1]
     port = sys.argv[2]

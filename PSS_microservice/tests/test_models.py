@@ -2,7 +2,7 @@ import pytest
 from mongoengine import DoesNotExist, connect, disconnect
 import sys
 sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
+from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501, E402
 
 sys.path.insert(1, 'PSS_microservice/src')
 

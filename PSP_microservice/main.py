@@ -7,9 +7,14 @@ import time
 import threading
 import requests
 
+"""
+App to for users to request protien predictions from Alphafold2
+with a queing system and workers to pick up tasks to
+execute the requets to Alphafold.
+
+"""
 
 app = FastAPI()
-
 
 celery = Celery('tasks')
 celery.config_from_object('celery_config')
@@ -18,12 +23,6 @@ celery.config_from_object('celery_config')
 sequence_task_status = {}
 # lock for dictionary
 sequence_lock = threading.Lock()
-
-"""
-App to retrive and request predictions from alphafold
-
-"""
-
 
 @app.get("/")  # test
 def run_check():
@@ -66,6 +65,23 @@ def run_check():
 
 @celery.task
 def predict_protein_structure(sequence):
+    """
+    Takes a sequence from the user and then creates a
+    task and task.id and then adds it to a task queue using
+    RabbitMQ as a broker. Celery worker picks the tasks off the queue 
+    and requests a prediction from alphafold.
+
+    Parameters
+    ----------
+    seqeunce : String
+        The sequence inputed by the user to make the prediction with
+
+    Returns
+    -------
+    Sequence : The final result score for the specified protein.
+    Structure : Predicted structure from aplhafold
+    """
+
     # Checks if the seqeunce is already in the queue
     if sequence in sequence_task_status:
         # if task found throw error and don't queue
@@ -93,6 +109,19 @@ def predict_protein_structure(sequence):
 @app.get("/predict")
 # use async so that we can handle multiple requests coming in
 async def predict_endpoint(sequence: str):
+    """
+    Helper fucntion for the workers to process the predictions.
+
+    Parameters
+    ----------
+    sequence : String
+        The sequence inputed by the user to make the prediction with
+
+    Returns
+    -------
+    task_id: task id is a unique identifier for the task created
+    in_queue: if the task gets queued it will return True
+    """
     # TODO check if sequence is already being predicted
 
     # queue task passing sequence as a parameter
@@ -107,6 +136,7 @@ async def predict_endpoint(sequence: str):
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
+    
     # Checking the status of requested task
     result = AsyncResult(task_id)
     if result.state == 'PENDING':
@@ -121,6 +151,19 @@ async def read_task(task_id: str):
 # Endpoint to search predictions already stored in alpha
 @app.get('/get_predicted/{qualifier}')
 def get_prediction(qualifier):
+    """
+    Endpoint to get a predicted protien from the alphafold databse
+
+    Parameters
+    ----------
+    qaulifier  : String
+        The uniprot qualifier given by the user. 
+
+    Returns
+    -------
+    aphafold_raw_data: dictionary of raw data 
+
+    """
     url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
     result = requests.get(url)  # Fetch corresponding JSON from alphafold API
     if result.ok:
@@ -132,6 +175,19 @@ def get_prediction(qualifier):
 
 @app.get('/get_sequence/{qualifier}')
 def get_alphafold_sequence(qualifier):
+    """
+    Endpoint to get a sequence from the alphafold databse
+
+    Parameters
+    ----------
+    qaulifier  : String
+        The uniprot qualifier given by the user. 
+
+    Returns
+    -------
+    Sequence: protien sequence
+
+    """
     url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
     result = requests.get(url)  # Fetch corresponding JSON from alphafold API
     if result.ok:
@@ -143,6 +199,19 @@ def get_alphafold_sequence(qualifier):
 
 @app.get('/showstruct/{qualifier}')
 def show_structure(qualifier):
+    """
+    Endpoint to take the user to the 3D model of the structure
+
+    Parameters
+    ----------
+    qaulifier  : String
+        The uniprot qualifier given by the user. 
+
+    Returns
+    -------
+    Url redirect: redirected to the alphafold model page
+
+    """
     url = f"https://alphafold.ebi.ac.uk/api/uniprot/summary/{qualifier}.json"
     result = requests.get(url)  # Fetch corresponding JSON from alphafold API
     if result.ok:
@@ -154,5 +223,9 @@ def show_structure(qualifier):
 
 
 if __name__ == '__main__':
+    """
+    main function to start up the app
+
+    """
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

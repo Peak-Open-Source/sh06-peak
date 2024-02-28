@@ -1,32 +1,17 @@
 version: "3.8"
 services:
-  myMongo:
-    image: mongo
+  mongodb:
+    image: mongo:latest
+    restart: always
     ports:
-      - 8001:27017  # Corrected port mapping
+      - 27017:27017  # Corrected port mapping
     volumes:
-      - ProteinDatabase:/data/db
+      - protein_collection:/data/db
 
   pss:
-    build: ""
+    build: .
     ports:
-      - 27018:27017
-    depends_on:
-      - mongoexpress
-    environment:
-      DB_URI: "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"
-
-  mongoexpress:
-    image: mongo-express
-    container_name: my-mongo-express
-    ports:
-      - 5000:8081  # Corrected port mapping
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=proteinLovers
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=protein-Lovers2
-      - ME_CONFIG_MONGODB_SERVER=proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority  # Corrected MongoDB server URI
-    volumes:
-      - ProteinDatabase:/data/db
+      - 80:80
 
 volumes: 
-  ProteinDatabase:
+  protein_collection:

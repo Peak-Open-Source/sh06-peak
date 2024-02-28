@@ -1,17 +1,13 @@
-import pytest
 from mongoengine import DoesNotExist, connect, disconnect
 import sys
-sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501, E402
-
-sys.path.insert(1, 'PSS_microservice/src')
+sys.path.append("../PSS_microservice")
+from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
 
 # class TestDatabase():
 
 # def setUp(self):
 #     # Connect to the test database
 #     connect('TestDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")  # noqa:E501
-
 # def tearDown(self):
 #     # Disconnect from the database
 #     disconnect()
@@ -51,7 +47,6 @@ def test_search_sequence():
     write_to_database(seq, pdb, url)
 
     result = search(seq, "Sequence")
-
     assert result.Sequence == seq, "Protein unsuccessfully found by sequence"
 
 
@@ -66,7 +61,8 @@ def test_search_pdb():
     assert result.PDB == pdb, "Protein unsuccessfully found by pdb"
 
 
-def test_search_key(self):
+def test_search_key():
+
     key = '65c3cc07d603c8bb41f7a5d0'
 
     result = search(key, "Key")
@@ -133,7 +129,8 @@ def test_delete_file_by_key():
     url = "http://exampledelete.com"
     write_to_database(seq, pdb, url)
     connect('ProteinDatabase',
-            host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+            host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",  # noqa: E501
+            uuidRepresentation="standard")
     key = ProteinCollection.objects.get(Sequence=seq).id
     disconnect()
 
@@ -158,5 +155,4 @@ def test_write_to_database_new_protein():
 
     # check if the protein is stored in the database
     result = search(seq, "Sequence")
-
     assert result is not None, "Protein unsuccessfully stored in database"

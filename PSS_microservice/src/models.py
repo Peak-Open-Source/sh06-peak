@@ -5,7 +5,7 @@ WEB_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.
 USE_LOCAL = False
 HOST_URL = LOCAL_URL if USE_LOCAL else WEB_URL
 
-DATABASE_NAME = "ProteinCollection"
+DATABASE_NAME = "ProteinDatabase"
 
 
 class ProteinCollection(Document):
@@ -72,7 +72,8 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
         write_to_database(seq, pdb, url, file_content)
 
 
-def write_to_database(seq: str, pdb: str, url: str, file_content: str) -> None:
+def write_to_database(seq: str, pdb: str, url: str,
+                      file_content: str = "") -> None:
     """
     The function `write_to_database` writes protein sequence, PDB ID, and URL
     to a MongoDB database, checking for existing entries and updating if

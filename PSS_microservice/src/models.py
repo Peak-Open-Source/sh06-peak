@@ -1,67 +1,91 @@
 from mongoengine import connect, Document, StringField, disconnect, DictField
-from pymongo import *
-import json
-from subprocess import Popen, PIPE
 
 
-
-
-#below; creates a new protein object
-class ProteinCollection(Document): 
+# below; creates a new protein object
+class ProteinCollection(Document):
     Sequence = StringField(require=True)
-    PDB = DictField(required = True)
-    URL = StringField(required = True)
+    PDB = StringField(required=True)
+    URL = StringField(required=True)
+    FileContent = StringField()
 
+
+def create_or_update(seq, pdb, url):
+    connect('ProteinDatabase', 
+            host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority", 
+            uuidRepresentation='standard')
+    
+    collection = ProteinCollection.objects(PDB=pdb)
+    if collection.count() > 0:
+        for entry in collection:
+            entry.PDB = pdb
+            entry.Sequence = seq
+            entry.URL = url
+            entry.save()
+    else:
+        write_to_database(seq, pdb, url)
 
 
 
 def write_to_database(seq, pdb, url):
     try:
-        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase',
+                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",
+                uuidRepresentation='standard')
 
-        existing = ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url).first()
+        seq_query = ProteinCollection.objects(Sequence=seq)
+        pdb_query = ProteinCollection.objects(PDB=pdb)
 
-        if existing:
-            if existing.PDB != pdb:
-                update_structure(existing.id, pdb)
-            else:
-                print("Already stored")
-        
-        else:
-            new_doc = ProteinCollection(Sequence=seq, PDB=pdb, URL=url)
-            new_doc.save()
-            print("Added successfully")
-            
-    
+        if seq_query.count() > 0 and pdb_query.count() == 0:
+            doc_id = seq_query.first().id
+            print(doc_id)
+            update_structure(doc_id, pdb)
+
+        elif ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
+            print("Already stored")
+
+        elif not ProteinCollection.objects(Sequence=seq, PDB=pdb, URL=url):
+            # check if already exists;
+            print("successful")
+            ProteinCollection(Sequence=seq, PDB=pdb, URL=url).save()
+
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         disconnect()
-    
+
 
 
 def search(to_find, field):
+    # returns entire document; not just value searched for; can be changed
+    # document = ProteinCollection.objects.only('Sequence').get(Sequence=to_find) ;  for specific fields to be returned
     try:
-        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase', 
+                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",
+                uuidRepresentation='standard')
+        
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_find)
-            return(document)
+            return (document)
         elif field == "PDB":
             document = ProteinCollection.objects.get(PDB=to_find)
-            return(document)
+            return (document)
         elif field == "Key":
             document = ProteinCollection.objects.get(id=to_find)
-            return(document)
-        
+            return (document)
+
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         disconnect()
+
 
 
 def update_structure(id_to_find, new_structure):
     try:
-        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
+        connect('ProteinDatabase',
+                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",
+                uuidRepresentation='standard')
+        
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_structure
         document.save()
@@ -71,10 +95,13 @@ def update_structure(id_to_find, new_structure):
         disconnect()
 
 
+
 def delete_file(to_delete, field):
     try:
-        connect('ProteinDatabase',host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")
-        #want to call 'search' to avoid repeating, causes connect error; check
+        connect('ProteinDatabase',
+                host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",
+                uuidRepresentation='standard')
+        # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_delete)
         elif field == "PDB":
@@ -82,7 +109,7 @@ def delete_file(to_delete, field):
         elif field == "Key":
             document = ProteinCollection.objects.get(id=to_delete)
         document.delete()
-        
+
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
@@ -90,7 +117,7 @@ def delete_file(to_delete, field):
 
 
 
+# connect info:
 
-
-#& C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"
-#python sh06-main/cli/__main__.py get uniprot P12319   
+# & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"
+# python sh06-main/cli/__main__.py get uniprot P12319

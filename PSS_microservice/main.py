@@ -1,19 +1,19 @@
 import json
 import tarfile
 import os
-from pytest import console_main
 import requests
 import numpy as np
-import pymongo as MongoClient
 
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 import src.models as models  # noqa:F401
 
 from src.db_operations import connect_to_mongodb, get_data_from_mongodb
 from src.db_operations import SampleDocument  # noqa:F401
 from src.docker_operations import start_docker_container
+
 
 try:
     from .src import uniprot_parser as uniprot_parser
@@ -25,8 +25,6 @@ except ImportError:
 ALPHAFOLD_PENALTY = .1
 
 app = FastAPI()
-HOST = "0.0.0.0"
-PORT = 5000
 
 # This should be a from our database of stored structures
 protein_structures = {}
@@ -90,12 +88,19 @@ def find_matching_structures(sequence: str):
     return matches
 
 
+best_structures = {}
 pdb_sequences = {}
 # Endpoint to retrieve protein structures by Uniprot ID
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id):
+def retrieve_by_uniprot_id(uniprot_id, noCache: bool = False):
+    if not noCache and uniprot_id in best_structures:
+        return {'structure': best_structures[uniprot_id],
+                'sequence': pdb_sequences[best_structures[uniprot_id]["id"]]
+                if best_structures[uniprot_id]["id"] in pdb_sequences
+                else "SequenceNotFound"
+                }
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
     valid_references = raw_uniprot_data[0]
     sequence = raw_uniprot_data[1]
@@ -105,8 +110,8 @@ def retrieve_by_uniprot_id(uniprot_id):
         best_structure = select_best_structure(parsed_proteins)
         if best_structure is None:
             return {"error": "No valid structure found"}
-        pdb_sequences[best_structure["id"]] = sequence
-        print(pdb_sequences)
+        best_structures[uniprot_id] = best_structure
+        pdb_sequences[best_structure["id"].lower()] = sequence
         return {'structure': best_structure,
                 'sequence': sequence}
     else:
@@ -116,6 +121,7 @@ def retrieve_by_uniprot_id(uniprot_id):
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
 def fetch_pdb_by_id(request: Request, pdb_id):
+    pdb_id = pdb_id.lower()
     archive_url = ("https://www.ebi.ac.uk/pdbe/download/api/pdb"
                    f"/entry/archive?data_format=pdb&id={pdb_id}")
     archive_result = requests.get(archive_url)
@@ -129,34 +135,20 @@ def fetch_pdb_by_id(request: Request, pdb_id):
             tar.extractall(f"./{pdb_id}")
         os.remove("tmp.tar.gz")
 
-        file = [f for f in os.listdir(os.getcwd() + "/" + pdb_id)
-                if f != "contains.txt"][0]
         # below - what to be passed to models for the db
         # sequence = pdb_sequences[pdb_id]
 
         # path = os.getcwd() + "/" + pdb_id + "/" + file
-        url = request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
-
-        try:
-            url = url._url
-        except AttributeError:
-            # Some machines just return url directly
-            pass
+        url = "/download_pdb/" + pdb_id
 
 
 # below - what to be passed to models for the db
         if pdb_id in pdb_sequences:
             sequence = pdb_sequences[pdb_id]  # noqa:F841
-            path = os.getcwd() + "/" + pdb_id + "/" + file  # noqa:F841
-            request.url_for("download_pdb", pdb_id=pdb_id, file_name=file)
-            try:
-                url = url._url
-            except AttributeError:
-                pass
 
             # TODO - get database links working on pipeline
 
-            # models.write_to_database(sequence, path, url)
+            models.create_or_update(sequence, pdb_id, url)
 
             # testing the find function; works
             # prot = models.find("ramen")
@@ -171,9 +163,9 @@ def fetch_pdb_by_id(request: Request, pdb_id):
                 "error": archive_result.reason}
 
 
-# TODO - Simplify endpoint call to "/download_pdb/{pdb_id}"
-@app.get("/download_pdb/{pdb_id}/{file_name}")
-def download_pdb(pdb_id, file_name):
+@app.get("/download_pdb/{pdb_id}")
+def download_pdb(pdb_id):
+    file_name = "pdb" + pdb_id.lower() + ".ent"
     path = f"{os.getcwd()}/{pdb_id}/{file_name}"
     if (os.path.exists(path) and
        "contains.txt" in os.listdir(os.getcwd() + "/" + pdb_id)):
@@ -187,8 +179,7 @@ def download_pdb(pdb_id, file_name):
 @app.post('/retrieve_by_sequence')
 def retrieve_by_sequence(sequence: str):
     # logic for getting protein from uniprot by id
-    document = models.search(sequence, "Sequence")
-    return document
+    return
 
 
 # Endpoint to retrieve sequence structures by key
@@ -196,38 +187,64 @@ def retrieve_by_sequence(sequence: str):
 def retrieve_by_key(key: str):
     # logic for getting sequence from uniprot by key
     # find(key, field = key)
-    document = models.search(key, "Key")
-    return document
+    return
+
+
+class UploadInformation(BaseModel):
+    pdb_id: str
+    sequence: str
+    file_content: str
+
+    def clean(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        for file_name in [f for f in os.listdir(folder_path)
+                          if f != "contains.txt"]:
+            os.remove(folder_path + "/" + file_name)
+
+    def store(self):
+        folder_path = f"{os.getcwd()}/{self.pdb_id}"
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+            with open(folder_path + "/contains.txt", "w") as f:
+                f.write(self.pdb_id)
+        else:
+            self.clean()
+
+        with open(f"{folder_path}/pdb{self.pdb_id.lower()}.ent", "w") as pdb_file:  # noqa:E501
+            pdb_file.write(self.file_content)
+
+        models.create_or_update(self.sequence,
+                                self.pdb_id,
+                                "/download_pdb/" + self.pdb_id)
+
+        return True
 
 
 # Endpoint to store protein structures
-# @app.post('/store')
-def store_structure(key: str, structure: dict):
-    protein_structures[key] = structure
-    return {"message": "Structure stored"}
+@app.post('/store')
+def store_structure(upload_information: UploadInformation):
+    protein_structures[upload_information.pdb_id] = upload_information
+    success = upload_information.store()
+    return {"success": success}
 
 
 def main():
+    # Database configuration
+    database_name = 'your_database_name'
+    mongodb_uri = 'your_mongodb_uri'
+    connect_to_mongodb(database_name, mongodb_uri)
 
-    uri = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"
+    # Retrieve data from the MongoDB database
+    data_from_mongo = get_data_from_mongodb()
 
-    client = MongoClient(uri)
-    async def run():
-        try:
-            await client.connect()
-            global_and_us = client.covid19.global_and_us
-            cursor = global_and_us.find({"country": "France"}).sort("date", -1).limit(2)
-            async for document in cursor:
-                print(document)
-        finally:
-            await client.close()
+    # Write the data to a JSON file
+    with open('mongodb_data.json', 'w') as json_file:
+        json_file.write(data_from_mongo)
 
-            await run()
-
-    run().catch(console_main.dir)
-
+    # Use Docker Compose to create a container and upload the data
+    start_docker_container()
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host=HOST, port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=80)

@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 
 
 def start_docker_container():
-    docker_compose_command = "docker-compose up --d"
+    docker_compose_command = "docker-compose up --detach"
     process = Popen(docker_compose_command, shell=True,
                     stdout=PIPE, stderr=PIPE)
     stdout, stderr = process.communicate()

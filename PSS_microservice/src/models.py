@@ -58,22 +58,23 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
         protein sequence
     """
 
-    connect(DATABASE_NAME, host=HOST_URL)
-    collection = ProteinCollection.objects(PDB=pdb).first()
-    if collection is not None:
-        entry = collection
-        entry.PDB = pdb
-        entry.Sequence = seq
-        entry.URL = url
-        entry.FileContent = file_content
-        entry.save()
+    connect('ProteinDatabase', host=HOST_URL, uuidRepresentation='standard')
+    collection = ProteinCollection.objects(PDB=pdb)
+    if collection.count() > 0:
+        for entry in collection:
+            entry.PDB = pdb
+            entry.Sequence = seq
+            entry.URL = url
+            entry.FileContent = file_content
+            entry.save()
         disconnect()
     else:
         disconnect()
         write_to_database(seq, pdb, url, file_content)
 
 
-def write_to_database(seq: str, pdb: str, url: str, file_content: str) -> None:
+def write_to_database(seq: str, pdb: str, url: str,
+                      file_content: str = "") -> None:
     """
     The function `write_to_database` writes protein sequence, PDB ID, and URL
     to a MongoDB database, checking for existing entries and updating if
@@ -99,7 +100,7 @@ def write_to_database(seq: str, pdb: str, url: str, file_content: str) -> None:
     """
 
     try:
-        connect(DATABASE_NAME, host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL, uuidRepresentation='standard')
 
         seq_query = ProteinCollection.objects(Sequence=seq)
         pdb_query = ProteinCollection.objects(PDB=pdb)
@@ -151,7 +152,8 @@ def search(to_find: str, field: str) -> ProteinCollection:
     """
 
     try:
-        connect(DATABASE_NAME, host=HOST_URL)  # noqa:E501
+        connect(DATABASE_NAME, host=HOST_URL, uuidRepresentation='standard')  # noqa:E501
+
         if field == "Sequence":
             document = ProteinCollection.objects(Sequence=to_find).first()
             return (document)
@@ -185,7 +187,7 @@ def update_structure(id_to_find: str, new_pdb: str) -> None:
     """
 
     try:
-        connect(DATABASE_NAME, host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL, uuidRepresentation='standard')
         document = ProteinCollection.objects.get(id=id_to_find)
         document.PDB = new_pdb
         document.save()
@@ -215,7 +217,7 @@ def delete_file(to_delete: str, field: str) -> None:
     """
 
     try:
-        connect(DATABASE_NAME, host=HOST_URL)
+        connect(DATABASE_NAME, host=HOST_URL, uuidRepresentation='standard')
         # want to call 'search' to avoid repeating, causes connect error; check
         if field == "Sequence":
             document = ProteinCollection.objects.get(Sequence=to_delete)
@@ -231,13 +233,6 @@ def delete_file(to_delete: str, field: str) -> None:
         disconnect()
 
 
-# my little weeny tests; all working as intended
-
-# delete_file("pdbdoc","PDB")
-# write_to_database("accatgagatsgstaaga","clobbering","wikipedia.com")
-# update_file('65afbb69f6a68a6a4e715d57', "1F6B")
-# doc_to_find = search("17fa" ,"PDB")
-# print(doc_to_find)
 # connect info:
 
 # & C:/Users/amypi/anaconda3/python.exe "c:/Users/amypi/OneDrive - University of Glasgow/PROJECT/PROJECT/sh06-main/PSS_microservice/main.py"   # noqa:E501

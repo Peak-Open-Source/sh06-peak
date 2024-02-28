@@ -44,7 +44,7 @@ class TestProtein():
         test_protein.add_coverage(630, 650)
         test_protein.add_coverage(20, 50)
         test_protein.merge_coverages()
-        test_protein.calculate_coverages() == 50
+        assert test_protein.calculate_coverages() == 50
 
     def test_overlap_quad_merge(self):
         test_protein = Protein("1X")
@@ -61,7 +61,7 @@ class TestProtein():
         test_protein.add_coverage(615, 640)
         test_protein.add_coverage(20, 50)
         test_protein.merge_coverages()
-        test_protein.calculate_coverages() == 65
+        assert test_protein.calculate_coverages() == 65
 
 
 class TestClient():
@@ -71,7 +71,7 @@ class TestClient():
                                   + protein_id).json()["structure"]["id"]
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
-        path = f"{os.getcwd()}/{structure_id}"
+        path = f"{os.getcwd()}/{structure_id.lower()}"
         assert os.path.exists(path)
         shutil.rmtree(path)
         assert not os.path.exists(path)
@@ -87,9 +87,10 @@ class TestClient():
                                   + protein_id).json()["structure"]["id"]
         result = client.get("/fetch_pdb_by_id/" + structure_id)
         assert "url" in result.json()
+        structure_id = structure_id.lower()
         path = f"{os.getcwd()}/{structure_id}"
         assert os.path.exists(path)
-        response = client.get(result.json()["url"][len("127.0.0.1:8000") + 3:])
+        response = client.get(result.json()["url"])
         file_content = response.content
         with open(f"{structure_id}.ent", "wb") as f:
             f.write(file_content)
@@ -103,7 +104,7 @@ class TestClient():
 
 class TestBestStructure():
     def test_select_best_structure(self):
-        # Dummy protiens
+        # Dummy proteins
         protein_xray = Protein(id=1, method="X-ray",
                                resolution=2.0, coverage=75)
         protein_nmr = Protein(id=2, method="NMR",

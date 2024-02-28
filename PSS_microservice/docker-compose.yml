@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017  # Corrected port mapping
+    volumes:
+      - protein_collection:/data/db
+
+  pss:
+    build: .
+    ports:
+      - 80:80
+
+volumes: 
+  protein_collection:

@@ -35,3 +35,10 @@ class PSSClient():
             return json.loads(result.content), True
         else:
             return {"error": "Request failed"}, False
+
+    def post(self, endpoint, args):
+        result = requests.post(f"{self.address}/{endpoint}", json=args)
+        if result.ok:
+            return json.loads(result.content), True
+        else:
+            return {"error": "Request failed"}, False

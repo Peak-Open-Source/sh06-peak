@@ -1,7 +1,9 @@
 import sys
+import os
 
 from PSSClient import PSSClient
 
+print("CWD:", os.getcwd())
 ip = (input("Please enter the IP of the PSS Microservice, \
            for example http://localhost (not the port!): ")
       if len(sys.argv) < 3 else sys.argv[1])
@@ -38,6 +40,36 @@ class Command():
         print(f"{self.name}\n{self.description}")
 
 
+def get_by_key(key: str):
+    protein_info, success = client.get("retrieve_by_key", [key])
+    if not success or protein_info["status"] == 404:
+        print("Retrieve by key failed - are you sure the key is valid?")
+    url_split = protein_info["url"].split("/")
+    fetch_result, success = client.download("download_pdb", url_split[2:])
+    if not success or "error" in str(protein_info):
+        print("PDB Download failure")
+        return
+
+    with open("pdb" + protein_info["pdb"].lower() + ".ent", "wb") as f:
+        f.write(fetch_result)
+    print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
+
+
+def get_by_sequence(seq: str):
+    protein_info, success = client.get("retrieve_by_sequence", [seq])
+    if not success or protein_info["status"] == 404:
+        print("Retrieve by sequence failed - are you sure the sequence is valid?")  # noqa: E501
+    url_split = protein_info["url"].split("/")
+    fetch_result, success = client.download("download_pdb", url_split[2:])
+    if not success or "error" in str(protein_info):
+        print("PDB Download failure")
+        return
+
+    with open("pdb" + protein_info["pdb"].lower() + ".ent", "wb") as f:
+        f.write(fetch_result)
+    print("Download successful, saved as", "pdb" + protein_info["pdb"] + ".ent")  # noqa: E501
+
+
 def get_best_uniprot(id: str):
     best_uniprot, success = client.get("retrieve_by_uniprot_id", [id])
     if not success:
@@ -53,12 +85,12 @@ def get_best_uniprot(id: str):
         return
 
     url_split = fetch_result["url"].split("/")
-    fetch_result, success = client.download("download_pdb", url_split[4:])
+    fetch_result, success = client.download("download_pdb", url_split[2:])
     if not success or "error" in str(fetch_result):
         print("PDB Download failure")
         return
 
-    with open("pdb" + pdb_id + ".ent", "wb") as f:
+    with open("pdb" + pdb_id.lower() + ".ent", "wb") as f:
         f.write(fetch_result)
     print("Download successful, saved as", "pdb" + pdb_id + ".ent")
 
@@ -66,6 +98,28 @@ def get_best_uniprot(id: str):
 def get(type: str, id: str):
     if type == "uniprot":
         get_best_uniprot(id)
+    elif type == "key":
+        get_by_key(id)
+    elif type == "sequence":
+        get_by_sequence(id)
+
+
+def store(file_path: str, pdb_id: str, sequence: str):
+    try:
+        with open(file_path, "r") as pdb_file:
+            byte_info = pdb_file.read()
+            result, success = client.post("store",
+                                          {
+                                              "pdb_id": pdb_id,
+                                              "sequence": sequence,
+                                              "file_content": byte_info})
+            if "success" in result and result["success"]:
+                print("Upload successful!")
+            else:
+                print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
+    except Exception:
+        print("Upload failed - make sure that the server is running, and that your file path is correct.")  # noqa:E501
+        return False
 
 
 def help():
@@ -90,10 +144,20 @@ COMMANDS = {
         "get",
         "Usage \
             \"get [database_type] [id]\"\
-            \"\nFetches and downloads best PDB from appropriate database.\
+            \nFetches and downloads best PDB from appropriate database.\
+            \nValid database_type: uniprot, key, sequence\
             \nExample Usage: get uniprot P12319",
         get,
         2
+    ),
+    "store": Command(
+        "store",
+        "Usage \
+            \"store [file_path] [pdb_id] [sequence]\"\
+            \"\nUploads PDB file to server\
+            \nExample Usage: store pdbs/A123.ent A123 123123123123123123",
+        store,
+        3
     ),
     "exit": Command(
         "exit",

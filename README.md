@@ -69,4 +69,3 @@ Any edits to the build process should be made in either the Dockerfile or docker
     ├── Dockerfile   
     ├── README.md
     └── requirements.txt    
-

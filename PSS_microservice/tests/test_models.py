@@ -1,4 +1,5 @@
 from mongoengine import DoesNotExist, connect, disconnect
+#   from bson.objectid import ObjectId
 import sys
 sys.path.append("PSS_microservice/")
 from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection, HOST_URL  # noqa:E501,E402
@@ -29,13 +30,19 @@ def test_search_pdb():
 
 
 def test_search_key():
-
-    key = '65c3cc07d603c8bb41f7a5d0'
+    seq = "search_key"
+    pdb = "search_key"
+    url = "/search_key/123"
+    write_to_database(seq, pdb, url)
+    key = search(seq, "Sequence").id
 
     result = search(key, "Key")
-    assert str(result.id) == key, "Protein unsuccessfully found by key"
-# edit above as this key wont work forever
-# url - models.py
+    assert key, "Key doesn't exist"
+    assert str(result.id) == str(key), "Key search unsuccessful" + str(key)
+
+    delete_file(seq, "Sequence")
+    new_result = search(seq, "Sequence")
+    assert new_result is None, "Protein still exists"
 
 
 def test_update_structure():
@@ -51,7 +58,9 @@ def test_update_structure():
 
     result = search(seq, "Sequence")
     assert result.PDB == new_structure, "Structure not updated in database"
-    delete_file(new_structure, "Sequence")
+    delete_file(seq, "Sequence")
+    new_result = search(seq, "Sequence")
+    assert new_result is None, "Protein still exists"
 
 
 def test_delete_file_by_sequence():
@@ -63,7 +72,6 @@ def test_delete_file_by_sequence():
 
     delete_file(seq, "Sequence")
 
-    # check if protein is deleted from the database
     try:
         result = search(seq, "Sequence")
 
@@ -123,3 +131,5 @@ def test_write_to_database_new_protein():
     result = search(seq, "Sequence")
     assert result is not None, "Protein unsuccessfully stored in database"
     delete_file(seq, "Sequence")
+    new_result = search(seq, "Sequence")
+    assert new_result is None, "Protein still exists"

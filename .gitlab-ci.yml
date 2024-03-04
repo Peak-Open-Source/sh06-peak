@@ -20,10 +20,8 @@ run_tests:
   script:
     - pytest
 
-  only:
-    - branches  
   except:
-    - master 
+    - feature/pipeline/master
 
 # build_image:
 #   stage: build

@@ -53,9 +53,9 @@ build_cli_windows:
   image: python:3.11-windowsservercore
   script:
     - pip install pyinstaller
-    - pyinstaller --onefile --distpath ".\temp\win\dist" --workpath ".\temp\win\build" --specpath ".\temp\win" --name ProteinCLI "cli\ProteinClient.py"
+    - pyinstaller --onefile --distpath "./temp/win/dist" --workpath "./temp/win/build" --specpath "./temp/win" --name ProteinCLI "cli/ProteinClient.py"
   artifacts:
-    - ".\temp\win\dist\ProteinClient.exe"
+    - ./temp/win/dist/ProteinClient.exe
   only:
     - main
     - "feature/pipeline/master"

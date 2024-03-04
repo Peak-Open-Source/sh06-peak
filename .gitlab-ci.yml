@@ -50,7 +50,7 @@ build_cli_linux:
     - pyinstaller --onefile --distpath "./temp/linux/dist" --workpath "./temp/linux/build" --specpath "./temp/linux" --name ProteinCLI "cli/ProteinClient.py"
   artifacts:
     paths:
-      - temp/linux/dist/ProteinClient
+      - ./temp/linux/dist/ProteinClient
   only:
     - main
     - "feature/pipeline/master"

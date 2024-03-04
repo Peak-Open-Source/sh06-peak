@@ -20,8 +20,8 @@ run_tests:
   script:
     - pytest
 
-  except:
-    - feature/pipeline/master
+  # except:
+  #   - feature/pipeline/master
 
 build_image:
   stage: build
@@ -40,6 +40,10 @@ build_image:
   script:
     - docker build -t $IMAGE_NAME:$IMAGE_TAG ./PSS_microservice
     - docker push $IMAGE_NAME:$IMAGE_TAG
+
+  only:
+    - main
+    - "feature/pipeline/master"
 
 build_cli_linux:
   stage: build

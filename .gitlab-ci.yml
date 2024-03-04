@@ -55,10 +55,10 @@ build_cli_windows:
     - pip install pyinstaller
     - pyinstaller --onefile --distpath ".\temp\win\dist" --workpath ".\temp\win\build" --specpath ".\temp\win" --name ProteinCLI "cli\ProteinClient.py"
   artifacts:
-    - .\temp\win\dist\ProteinClient.exe
+    - ".\temp\win\dist\ProteinClient.exe"
   only:
     - main
-    - feature/pipeline/master
+    - "feature/pipeline/master"
 
 
 # release_cli_linux:

@@ -1,8 +1,7 @@
-from mongoengine import DoesNotExist, connect, disconnect
-#   from bson.objectid import ObjectId
+from mongoengine import DoesNotExist
 import sys
 sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure, HOST_URL  # noqa:E501,E402
+from src.models import write_to_database, delete_file, search, update_structure  # noqa:E501,E402
 
 
 def test_search_sequence():
@@ -30,7 +29,7 @@ def test_search_pdb():
 
 
 def test_search_key():
-    seq = "search_key"
+    seq = "SEARCHKEY"
     pdb = "search_key"
     url = "/search_key/123"
     write_to_database(seq, pdb, url)
@@ -47,7 +46,7 @@ def test_search_key():
 
 def test_update_structure():
     # test updating structure in database
-    seq = "update_me"
+    seq = "UPDATEPDB"
     pdb = "update_pdb"
     url = "/update_structure/123"
     write_to_database(seq, pdb, url)
@@ -65,7 +64,7 @@ def test_update_structure():
 
 def test_delete_file_by_sequence():
     # test deleting a protein by sequence
-    seq = "delete_me"
+    seq = "DELETEME"
     pdb = "test_pdb"
     url = "/delete_by_sequence/123"
     write_to_database(seq, pdb, url)
@@ -82,8 +81,8 @@ def test_delete_file_by_sequence():
 
 
 def test_delete_file_by_pdb():
-    seq = "ABCDE"
-    pdb = "test_delete_pdb"
+    seq = "DELETEPDB"
+    pdb = "test_delete_me"
     url = "/delete_by_pds/123"
     write_to_database(seq, pdb, url)
 
@@ -99,14 +98,12 @@ def test_delete_file_by_pdb():
 
 
 def test_delete_file_by_key():
-    seq = "key_delete"
+    seq = "DELETEKEY"
     pdb = "test_key_delete_pdb"
-    url = "/delete_by_key"
+    url = "/delete_by_key/123"
     write_to_database(seq, pdb, url)
 
-    connect('ProteinDatabase', host=HOST_URL, uuidRepresentation='standard')
     key = search(seq, "Sequence").id
-    disconnect()
 
     delete_file(key, "Key")
 

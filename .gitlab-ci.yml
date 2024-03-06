@@ -17,9 +17,9 @@ run_tests:
     - pip install -r ./requirements.txt
   
   script:
-    - pytest /tests
-    - pytest /PSS_microservice/tests
-    - pytest /PSP_microservice/tests
+    - pytest tests
+    - pytest PSS_microservice/tests
+    - pytest PSP_microservice/tests
 
   only:
     - branches  

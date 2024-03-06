@@ -196,7 +196,7 @@ def get_alphafold_sequence(qualifier):
         alphafold_dict = json.loads(result.content)
         alphafold_sequence = alphafold_dict[0]["uniprotSequence"]
     return {"Sequence": alphafold_sequence}  # displays data
- 
+
 
 @app.get('/showstruct/{qualifier}')
 def show_structure(qualifier):

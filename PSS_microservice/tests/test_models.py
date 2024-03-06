@@ -3,6 +3,14 @@ import sys
 sys.path.append("PSS_microservice/")
 from src.models import write_to_database, delete_file, search, update_structure  # noqa:E501,E402
 
+"""
+This file contains tests for the functions in the models.py file.
+
+Each test:
+1) Writes a test file to the database
+2) Tests the function
+3) Deletes the file written for testting
+    """
 
 def test_search_sequence():
     # test searching for a protein by sequence using the search function
@@ -29,6 +37,7 @@ def test_search_pdb():
 
 
 def test_search_key():
+    # test searching for a protein by key using the search function
     seq = "SEARCHKEY"
     pdb = "search_key"
     url = "/search_key/123"
@@ -71,6 +80,7 @@ def test_delete_file_by_sequence():
 
     delete_file(seq, "Sequence")
 
+    # check if protein is deleted from the database
     try:
         result = search(seq, "Sequence")
 
@@ -81,6 +91,7 @@ def test_delete_file_by_sequence():
 
 
 def test_delete_file_by_pdb():
+    # test deleting a protein by pdb
     seq = "DELETEPDB"
     pdb = "test_delete_me"
     url = "/delete_by_pds/123"
@@ -88,6 +99,7 @@ def test_delete_file_by_pdb():
 
     delete_file(pdb, "PDB")
 
+    # check if protein is deleted from the database
     try:
         result = search(pdb, "PDB")
 
@@ -98,6 +110,7 @@ def test_delete_file_by_pdb():
 
 
 def test_delete_file_by_key():
+    # test deleting a protein by key
     seq = "DELETEKEY"
     pdb = "test_key_delete_pdb"
     url = "/delete_by_key/123"

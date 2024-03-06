@@ -119,7 +119,7 @@ def test_delete_file_by_key():
 
 def test_write_to_database_new_protein():
     # test writing a completely new protein
-    seq = "ABCDE"
+    seq = "NEWPROTEIN"
     pdb = "new_pdb"
     url = "/write_new_protein/123"
     write_to_database(seq, pdb, url)
@@ -128,5 +128,10 @@ def test_write_to_database_new_protein():
     result = search(seq, "Sequence")
     assert result is not None, "Protein unsuccessfully stored in database"
     delete_file(seq, "Sequence")
-    new_result = search(seq, "Sequence")
-    assert new_result is None, "Protein still exists"
+    try:
+        result = search(seq, "Sequence")
+
+    except DoesNotExist:
+        result = None
+
+    assert result is None, "Protein not deleted from database"

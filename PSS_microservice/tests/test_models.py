@@ -1,11 +1,12 @@
 from mongoengine import DoesNotExist, connect, disconnect
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+from os import environ
 import sys
 sys.path.append("PSS_microservice/")
 from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
 
-env = dotenv_values()
-WEB_URL = env['WEB_URL']
+load_dotenv()
+WEB_URL = environ.get('WEB_URL')
 
 # class TestDatabase():
 

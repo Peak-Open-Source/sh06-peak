@@ -105,7 +105,7 @@ def test_delete_file_by_key():
     write_to_database(seq, pdb, url)
 
     connect('ProteinDatabase', host=HOST_URL, uuidRepresentation='standard')
-    key = ProteinCollection.objects.get(Sequence=seq).id
+    key = search(seq, "Sequence").id
     disconnect()
 
     delete_file(key, "Key")

@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
+from mongoengine import connect, disconnect
 
 from context import Protein
 from context import app
+from context import models
 from context import select_best_structure
 
 import os.path
@@ -100,6 +102,48 @@ class TestClient():
         os.remove(path + ".ent")
         shutil.rmtree(path)
         assert not os.path.exists(path)
+
+    def test_upload_file(self):
+        pdb = "t3stupload"
+        sequence = "UPLOADEDSEQUENCE"
+        file_content = "UPLOADED FILE CONTENT"
+        client.post("/store", json={
+            "pdb_id": pdb,
+            "sequence": sequence,
+            "file_content": file_content})
+        assert os.path.exists(f"{os.getcwd()}/{pdb.lower()}"), "File failed"
+        shutil.rmtree(f"{os.getcwd()}/{pdb.lower()}")
+        models.delete_file(sequence, "Sequence")
+
+    def test_retrieve_by_sequence(self):
+        pdb = "a123b"
+        sequence = "UNIQUESEQUENCE"
+        url = "/download_pdb/a123b"
+        file_content = "Retrieve by sequence!"
+        models.create_or_update(sequence, pdb, url, file_content)
+        result = client.get("/retrieve_by_sequence/UNIQUESEQUENCE").json()
+        assert result["status"] == 200, "Retrieve by seq failed"
+        models.delete_file(pdb, "PDB")
+
+    def test_retrieve_by_key(self):
+        pdb = "a123b"
+        sequence = "AAABAAAABBBBAAAAABBBBAABABABABBA"
+        url = "/download_pdb/a123b"
+        file_content = "Retrieve by key!"
+        connect(models.DATABASE_NAME, host=models.HOST_URL,
+                uuidRepresentation="standard", alias="default")
+        stored_pdb = models.ProteinCollection(
+            id="65e88893417a93f3a48ad47c",
+            Sequence=sequence,
+            PDB=pdb,
+            URL=url,
+            FileContent=file_content
+        )
+        stored_pdb.save()
+        disconnect()
+        result = client.get("/retrieve_by_key/65e88893417a93f3a48ad47c").json()
+        assert result["status"] == 200, "Retrieve by key failed"
+        models.delete_file(pdb, "PDB")
 
 
 class TestBestStructure():

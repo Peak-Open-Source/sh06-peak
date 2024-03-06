@@ -24,6 +24,7 @@ sequence_task_status = {}
 # lock for dictionary
 sequence_lock = threading.Lock()
 
+
 @app.get("/")  # test
 def run_check():
     """
@@ -47,7 +48,8 @@ def run_check():
                 Endpoint to predict protein structure. /predict
                 Go to endpoint</li>
                 <li><strong>Get Predicted Data:</strong>
-                Endpoint to retrieve predicted data. /get_predicted/qualifier</li>
+                Endpoint to retrieve predicted data./get_predicted/qualifier
+                </li>
                 <li><strong>Get AlphaFold Sequence:</strong>
                 Endpoint to retrieve AlphaFold sequence.
                 /get_sequence/qualifier</li>
@@ -68,7 +70,7 @@ def predict_protein_structure(sequence):
     """
     Takes a sequence from the user and then creates a
     task and task.id and then adds it to a task queue using
-    RabbitMQ as a broker. Celery worker picks the tasks off the queue 
+    RabbitMQ as a broker. Celery worker picks the tasks off the queue
     and requests a prediction from alphafold.
 
     Parameters
@@ -136,7 +138,7 @@ async def predict_endpoint(sequence: str):
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
-    
+
     # Checking the status of requested task
     result = AsyncResult(task_id)
     if result.state == 'PENDING':
@@ -157,11 +159,11 @@ def get_prediction(qualifier):
     Parameters
     ----------
     qaulifier  : String
-        The uniprot qualifier given by the user. 
+        The uniprot qualifier given by the user.
 
     Returns
     -------
-    aphafold_raw_data: dictionary of raw data 
+    aphafold_raw_data: dictionary of raw data
 
     """
     url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
@@ -181,7 +183,7 @@ def get_alphafold_sequence(qualifier):
     Parameters
     ----------
     qaulifier  : String
-        The uniprot qualifier given by the user. 
+        The uniprot qualifier given by the user.
 
     Returns
     -------
@@ -205,7 +207,7 @@ def show_structure(qualifier):
     Parameters
     ----------
     qaulifier  : String
-        The uniprot qualifier given by the user. 
+        The uniprot qualifier given by the user.
 
     Returns
     -------

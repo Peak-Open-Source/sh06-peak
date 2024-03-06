@@ -43,7 +43,7 @@ build_image:
 
   only:
     - main
-    - "feature/pipeline/master"
+    - feature/pipeline/master
 
 build_cli_linux:
   stage: build
@@ -56,7 +56,7 @@ build_cli_linux:
       - ./temp/linux/dist/ProteinCLI
   only:
     - main
-    - "feature/pipeline/master"
+    - feature/pipeline/master
 
 
 

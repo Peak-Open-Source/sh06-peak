@@ -59,13 +59,14 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
     """
 
     connect('ProteinDatabase', host=HOST_URL, uuidRepresentation='standard')
-    entry = ProteinCollection.objects(PDB=pdb).first()
-    if entry is not None:
-        entry.PDB = pdb
-        entry.Sequence = seq
-        entry.URL = url
-        entry.FileContent = file_content
-        entry.save()
+    collection = ProteinCollection.objects(PDB=pdb)
+    if collection.count() > 0:
+        for entry in collection:
+            entry.PDB = pdb
+            entry.Sequence = seq
+            entry.URL = url
+            entry.FileContent = file_content
+            entry.save()
         disconnect()
     else:
         disconnect()

@@ -1,7 +1,9 @@
 from mongoengine import connect, Document, StringField, disconnect
+from dotenv import dotenv_values
 
+env = dotenv_values()
+WEB_URL = env['WEB_URL']
 LOCAL_URL = "mongodb://pss_microservice-mongodb-1"  # Docker container name
-WEB_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
 USE_LOCAL = False
 HOST_URL = LOCAL_URL if USE_LOCAL else WEB_URL
 

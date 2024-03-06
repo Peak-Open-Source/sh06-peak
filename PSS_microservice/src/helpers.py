@@ -90,7 +90,7 @@ class UploadInformation(BaseModel):
         return True
 
 
-def calulate_score(protein: Protein) -> float:
+def calculate_score(protein: Protein) -> float:
     """
     Calculates a complete weighting for a specified protein.
     Takes into account each factor of the protein:
@@ -155,7 +155,7 @@ def select_best_structure(structures: list[Protein]) -> dict:
         return None
 
     # calculate the scores for all the proteins
-    scores = np.array([calulate_score(protein) for protein in structures])
+    scores = np.array([calculate_score(protein) for protein in structures])
     # get the best index
     best_index = np.argmax(scores)
     best_protein = structures[best_index]

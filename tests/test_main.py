@@ -4,7 +4,7 @@ from mongoengine import connect, disconnect
 from context import Protein
 from context import app
 from context import models
-from context import select_best_structure
+from context import select_best_structure, calculate_score
 
 import os.path
 import shutil
@@ -166,3 +166,12 @@ class TestBestStructure():
 
         best_structure = select_best_structure(structures)
         assert best_structure == protein_xray.as_dict()
+
+    def test_tiebreaker(self):
+        protein_alpha = Protein(id=1, method="Other", resolution=2.0, coverage=75)
+        protein_alpha.is_alphafold = True
+        protein_not_alpha = Protein(id=2, method="Other", resolution=2.0, 
+                                    coverage=75)
+        best_structure = select_best_structure([protein_alpha,
+                                                protein_not_alpha])
+        assert best_structure == protein_not_alpha.as_dict()

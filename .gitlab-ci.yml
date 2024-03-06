@@ -28,8 +28,10 @@ build_image:
 
   image: docker:24
   services:
-    - docker:24-dind
+   - name: docker:24-dind
+     alias: thedockerhost
   variables:
+    DOCKER_HOST: tcp://thedockerhost:2375/
     DOCKER_TLS_CERTDIR: "/certs"
     IMAGE_NAME: $HARBOR_HOST/$HARBOR_PROJECT/pss_microservice
     IMAGE_TAG: latest

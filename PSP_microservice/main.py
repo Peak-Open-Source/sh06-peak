@@ -1,11 +1,11 @@
-from fastapi import FastAPI, HTTPException
-import json
-from fastapi.responses import RedirectResponse, HTMLResponse
-from celery import Celery
-from celery.result import AsyncResult
-import time
-import threading
-import requests
+from fastapi import FastAPI
+from src.endpoints import (retrieve_alphafold_prediction,
+                           retrieve_alphafold_sequence,
+                           retrieve_alphafold_model,
+                           test_running,
+                           get_task_status,
+                           async_predict)
+
 
 """
 App to for users to request protien predictions from Alphafold2
@@ -15,14 +15,6 @@ execute the requets to Alphafold.
 """
 
 app = FastAPI()
-
-celery = Celery('tasks')
-celery.config_from_object('celery_config')
-
-# creating a threadsafe dictonary to store current sequences
-sequence_task_status = {}
-# lock for dictionary
-sequence_lock = threading.Lock()
 
 
 @app.get("/")  # test
@@ -34,78 +26,7 @@ def run_check():
         str: HTML formatted message indicating the
         application is running along with links to other endpoints.
     """
-    html_content = """
-    <html>
-        <head>
-            <title>AlphaFold API</title>
-        </head>
-        <body>
-            <h1>AlphaFold API</h1>
-            <p>running :)</p>
-            <h2>Endpoints:</h2>
-            <ul>
-                <li><strong>Predict Protein Structure:</strong>
-                Endpoint to predict protein structure. /predict
-                Go to endpoint</li>
-                <li><strong>Get Predicted Data:</strong>
-                Endpoint to retrieve predicted data./get_predicted/qualifier
-                </li>
-                <li><strong>Get AlphaFold Sequence:</strong>
-                Endpoint to retrieve AlphaFold sequence.
-                /get_sequence/qualifier</li>
-                <li><strong>Check Task Status:</strong>
-                Endpoint to check task status. /task/task_id </li>
-                <li><strong>Show Structure:</strong>
-                Endpoint to show protein structure.
-                /showstruct/qualifier </li>
-            </ul>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content, status_code=200)
-
-
-@celery.task
-def predict_protein_structure(sequence):
-    """
-    Takes a sequence from the user and then creates a
-    task and task.id and then adds it to a task queue using
-    RabbitMQ as a broker. Celery worker picks the tasks off the queue
-    and requests a prediction from alphafold.
-
-    Parameters
-    ----------
-    seqeunce : String
-        The sequence inputed by the user to make the prediction with
-
-    Returns
-    -------
-    Sequence : The final result score for the specified protein.
-    Structure : Predicted structure from aplhafold
-    """
-
-    # Checks if the seqeunce is already in the queue
-    if sequence in sequence_task_status:
-        # if task found throw error and don't queue
-        raise HTTPException(
-            status_code=400,
-            detail="Task already in progress for this sequence"
-        )
-    # Check if the task is in the queue
-    with sequence_lock:
-        sequence_task_status[sequence] = 'PENDING'
-
-    # for testing
-    time.sleep(60)
-
-    # TODO use alphafold to predict the protien and then return the sequence
-    predicted_structure = "prediction"
-    # remove task from queue after prediction has completed
-    with sequence_lock:
-        sequence_task_status.pop(sequence)
-
-    # return the predicted structure
-    return {'sequence': sequence, 'structure': predicted_structure}
+    return test_running()
 
 
 @app.get("/predict")
@@ -124,30 +45,12 @@ async def predict_endpoint(sequence: str):
     task_id: task id is a unique identifier for the task created
     in_queue: if the task gets queued it will return True
     """
-    # TODO check if sequence is already being predicted
-
-    # queue task passing sequence as a parameter
-    task = predict_protein_structure.apply_async(args=[sequence])
-
-    # store the task id
-    task_id = task.id
-    is_in_queue = AsyncResult(task_id).state == 'PENDING'
-    # displays the task id and if its in the queue
-    return {"task_id": task_id, "in_queue": is_in_queue}
+    return async_predict(sequence)
 
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
-
-    # Checking the status of requested task
-    result = AsyncResult(task_id)
-    if result.state == 'PENDING':
-        return {"task_id": task_id, "satus": result.state}
-    if result.state == 'PREDICTING':
-        return {"task_id": task_id, "satus": result.state}
-    if result.state == 'SUCCESS':
-        return {"result": result.result}
-    return {"status": result.state}
+    return get_task_status(task_id)
 
 
 # Endpoint to search predictions already stored in alpha
@@ -166,13 +69,7 @@ def get_prediction(qualifier):
     aphafold_raw_data: dictionary of raw data
 
     """
-    url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
-    result = requests.get(url)  # Fetch corresponding JSON from alphafold API
-    if result.ok:
-        # loads in the raw json data
-        alphafold_dict = json.loads(result.content)
-    # displays data
-    return {"aphafold_raw_data": alphafold_dict}
+    return retrieve_alphafold_prediction(qualifier)
 
 
 @app.get('/get_sequence/{qualifier}')
@@ -190,13 +87,7 @@ def get_alphafold_sequence(qualifier):
     Sequence: protien sequence
 
     """
-    url = f"https://alphafold.ebi.ac.uk/api/prediction/{qualifier}"
-    result = requests.get(url)  # Fetch corresponding JSON from alphafold API
-    if result.ok:
-        # loads in the raw json data
-        alphafold_dict = json.loads(result.content)
-        alphafold_sequence = alphafold_dict[0]["uniprotSequence"]
-    return {"Sequence": alphafold_sequence}  # displays data
+    return retrieve_alphafold_sequence(qualifier)
 
 
 @app.get('/showstruct/{qualifier}')
@@ -214,14 +105,7 @@ def show_structure(qualifier):
     Url redirect: redirected to the alphafold model page
 
     """
-    url = f"https://alphafold.ebi.ac.uk/api/uniprot/summary/{qualifier}.json"
-    result = requests.get(url)  # Fetch corresponding JSON from alphafold API
-    if result.ok:
-        alphafold_dict = json.loads(result.content)
-        # parses the raw data to find the model page
-        model_url = alphafold_dict["structures"][0]["summary"]["model_page_url"]  # noqa:E501
-    # redirects user to the model
-    return RedirectResponse(url=model_url)
+    return retrieve_alphafold_model(qualifier)
 
 
 if __name__ == '__main__':

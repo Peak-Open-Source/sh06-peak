@@ -2,7 +2,7 @@ from mongoengine import DoesNotExist, connect, disconnect
 #   from bson.objectid import ObjectId
 import sys
 sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection, HOST_URL  # noqa:E501,E402
+from src.models import write_to_database, delete_file, search, update_structure, HOST_URL  # noqa:E501,E402
 
 
 def test_search_sequence():

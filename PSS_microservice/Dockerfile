@@ -16,6 +16,9 @@ COPY . .
 EXPOSE 80
 
 # Define environment variable
+ARG HIDDEN
+ENV WEB_URL=$HIDDEN
+
 ENV PIP_ROOT_USER_ACTION=ignore
 
 # Run main.py when the container launches

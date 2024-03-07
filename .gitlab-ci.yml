@@ -45,7 +45,7 @@ build_image:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
   
   script:
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG ./PSS_microservice
+    - docker build --build-arg HIDDEN=$WEB_URL -t $IMAGE_NAME:$IMAGE_TAG ./PSS_microservice
     - docker push $IMAGE_NAME:$IMAGE_TAG
 
   only:

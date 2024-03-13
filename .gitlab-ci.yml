@@ -28,7 +28,9 @@ run_tests:
     - pip install -r ./requirements.txt
   
   script:
-    - pytest
+    - pytest tests
+    - pytest PSS_microservice/tests
+    - pytest PSP_microservice/tests
 
 build_image:
   stage: build

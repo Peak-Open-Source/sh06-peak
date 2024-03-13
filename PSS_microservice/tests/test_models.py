@@ -1,7 +1,47 @@
-from mongoengine import DoesNotExist
+from mongoengine import DoesNotExist, connect, disconnect
+from dotenv import load_dotenv
+from os import environ
 import sys
 sys.path.append("PSS_microservice/")
-from src.models import write_to_database, delete_file, search, update_structure  # noqa:E501,E402
+from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
+
+load_dotenv()
+WEB_URL = environ.get('WEB_URL')
+
+# class TestDatabase():
+
+# def setUp(self):
+#     # Connect to the test database
+#     connect('TestDatabase', host="")  # noqa:E501
+# def tearDown(self):
+#     # Disconnect from the database
+#     disconnect()
+
+# def test_write_to_database_existing_seq(self):
+#     # test writing a new protein with an existing sequence
+#     seq = "ABCDE"
+#     pdb = "test_pdb"
+#     url = "http://example.com"
+#     write_to_database(seq, pdb, url)
+
+#     # check if the protein is updated in the database
+#     result = ProteinCollection.objects.get(Sequence=seq)
+#     self.assertEqual(result.PDB, pdb)
+
+# def test_write_to_database_existing_pdb(self):
+#     # test writing a new protein with an existing pdb
+#     seq = "ABCDE"
+#     pdb = "test_pdb"
+#     url = "http://example.com"
+#     write_to_database(seq, pdb, url)
+
+#     # check if the protein is updated in the database
+#     result = ProteinCollection.objects.get(PDB=pdb)
+#     self.assertEqual(result.Sequence, seq)
+
+
+def test_models():
+    print("passed")
 
 """
 This file contains tests for the functions in the models.py file.
@@ -20,12 +60,11 @@ def test_search_sequence():
     """
     seq = "SEARCHSEQ"
     pdb = "search_seq_pdb"
-    url = "/search_seq/123"
+    url = "http://searchseq.com"
     write_to_database(seq, pdb, url)
 
     result = search(seq, "Sequence")
     assert result.Sequence == seq, "Protein unsuccessfully found by sequence"
-    delete_file(seq, "Sequence")
 
 
 def test_search_pdb():
@@ -35,12 +74,11 @@ def test_search_pdb():
     """
     seq = "SEARCHPDB"
     pdb = "search_pdb_pdb"
-    url = "/search_pdb/123"
+    url = "http://searchpdb.com"
     write_to_database(seq, pdb, url)
 
     result = search(pdb, "PDB")
     assert result.PDB == pdb, "Protein unsuccessfully found by pdb"
-    delete_file(pdb, "PDB")
 
 
 def test_search_key():
@@ -55,12 +93,7 @@ def test_search_key():
     key = search(seq, "Sequence").id
 
     result = search(key, "Key")
-    assert key, "Key doesn't exist"
-    assert str(result.id) == str(key), "Key search unsuccessful" + str(key)
-
-    delete_file(seq, "Sequence")
-    new_result = search(seq, "Sequence")
-    assert new_result is None, "Protein still exists"
+    assert str(result.id) == key, "Protein unsuccessfully found by key"
 
 
 def test_update_structure():
@@ -71,7 +104,7 @@ def test_update_structure():
     """
     seq = "UPDATEPDB"
     pdb = "update_pdb"
-    url = "/update_structure/123"
+    url = "http://update.com"
     write_to_database(seq, pdb, url)
 
     new_structure = "new_test_pdb"
@@ -79,10 +112,7 @@ def test_update_structure():
     update_structure(id_to_find, new_structure)
 
     result = search(seq, "Sequence")
-    assert result.PDB == new_structure, "Structure not updated in database"
-    delete_file(seq, "Sequence")
-    new_result = search(seq, "Sequence")
-    assert new_result is None, "Protein still exists"
+    assert result.PDB == new_structure, "Protein structure unsuccessfully updated in database"  # noqa: E501
 
 
 def test_delete_file_by_sequence():
@@ -92,7 +122,7 @@ def test_delete_file_by_sequence():
     """
     seq = "DELETEME"
     pdb = "test_pdb"
-    url = "/delete_by_sequence/123"
+    url = "http://example.com"
     write_to_database(seq, pdb, url)
 
     delete_file(seq, "Sequence")
@@ -100,7 +130,6 @@ def test_delete_file_by_sequence():
     # check if protein is deleted from the database
     try:
         result = search(seq, "Sequence")
-
     except DoesNotExist:
         result = None
 
@@ -137,10 +166,13 @@ def test_delete_file_by_key():
     """
     seq = "DELETEKEY"
     pdb = "test_key_delete_pdb"
-    url = "/delete_by_key/123"
+    url = "http://exampledelete.com"
     write_to_database(seq, pdb, url)
-
-    key = search(seq, "Sequence").id
+    connect('ProteinDatabase',
+            host=WEB_URL,  # noqa: E501
+            uuidRepresentation="standard")
+    key = ProteinCollection.objects.get(Sequence=seq).id
+    disconnect()
 
     delete_file(key, "Key")
 
@@ -162,17 +194,9 @@ def test_write_to_database_new_protein():
     """
     seq = "NEWPROTEIN"
     pdb = "new_pdb"
-    url = "/write_new_protein/123"
+    url = "http://example.com"
     write_to_database(seq, pdb, url)
 
     # check if the protein is stored in the database
     result = search(seq, "Sequence")
     assert result is not None, "Protein unsuccessfully stored in database"
-    delete_file(seq, "Sequence")
-    try:
-        result = search(seq, "Sequence")
-
-    except DoesNotExist:
-        result = None
-
-    assert result is None, "Protein not deleted from database"

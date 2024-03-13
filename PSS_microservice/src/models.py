@@ -1,7 +1,10 @@
 from mongoengine import connect, Document, StringField, disconnect
+from dotenv import load_dotenv
+from os import environ
 
+load_dotenv()
+WEB_URL = environ.get('WEB_URL')
 LOCAL_URL = "mongodb://pss_microservice-mongodb-1"  # Docker container name
-WEB_URL = "mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority"  # noqa:E501
 USE_LOCAL = False
 HOST_URL = LOCAL_URL if USE_LOCAL else WEB_URL
 
@@ -59,13 +62,14 @@ def create_or_update(seq: str, pdb: str, url: str, file_content: str) -> None:
     """
 
     connect('ProteinDatabase', host=HOST_URL, uuidRepresentation='standard')
-    entry = ProteinCollection.objects(PDB=pdb).first()
-    if entry is not None:
-        entry.PDB = pdb
-        entry.Sequence = seq
-        entry.URL = url
-        entry.FileContent = file_content
-        entry.save()
+    collection = ProteinCollection.objects(PDB=pdb)
+    if collection.count() > 0:
+        for entry in collection:
+            entry.PDB = pdb
+            entry.Sequence = seq
+            entry.URL = url
+            entry.FileContent = file_content
+            entry.save()
         disconnect()
     else:
         disconnect()

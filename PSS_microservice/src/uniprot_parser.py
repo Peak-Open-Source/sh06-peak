@@ -71,14 +71,3 @@ def parse_uniprot_data(uniprot_dbs: list):
             parsed_proteins.append(protein_ref)
 
     return parsed_proteins
-
-
-if __name__ == "__main__":
-    TEST_ID = "P05067"
-    uniprot_data = get_raw_uniprot_data(TEST_ID)
-    reference_list = uniprot_data[0]
-    sequence = uniprot_data[1]
-    parsed_proteins = parse_uniprot_data(reference_list)
-    for protein in parsed_proteins:
-        print("\n", protein)
-    print("\n", sequence)

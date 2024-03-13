@@ -4,9 +4,6 @@ import src.models as models  # noqa:F401
 from src.helpers import UploadInformation
 from src.endpoints import (base, get_best_uniprot, download_pdb_on_server,
                            serve_pdb, serve_by_key, serve_by_sequence, store)
-from src.helpers import UploadInformation
-from src.endpoints import (base, get_best_uniprot, download_pdb_on_server,
-                           serve_pdb, serve_by_key, serve_by_sequence, store)
 
 app = FastAPI()
 
@@ -18,7 +15,6 @@ def run_check() -> RedirectResponse:
     Default return when no endpoint is called
     """
     # TODO: Make this return something useful
-    return base()
     return base()
 
 
@@ -49,7 +45,6 @@ def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False) -> dict:
            data.
     """
     return get_best_uniprot(uniprot_id, no_cache)
-    return get_best_uniprot(uniprot_id, no_cache)
 
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
@@ -71,7 +66,6 @@ def fetch_pdb_by_id(pdb_id: str) -> dict:
            fetched PDB file.
     """
     return download_pdb_on_server(pdb_id)
-    return download_pdb_on_server(pdb_id)
 
 
 @app.get("/download_pdb/{pdb_id}")
@@ -91,7 +85,6 @@ def download_pdb(pdb_id: str) -> FileResponse | dict:
     -------
     File : Returns all file information for the specified PDB ID.
     """
-    return serve_pdb(pdb_id)
     return serve_pdb(pdb_id)
 
 
@@ -115,7 +108,6 @@ def retrieve_by_sequence(sequence: str) -> dict:
            database.
     """
     return serve_by_sequence(sequence)
-    return serve_by_sequence(sequence)
 
 
 # Endpoint to retrieve sequence structures by key
@@ -137,7 +129,6 @@ def retrieve_by_key(key: str) -> dict:
            the corresponding protein's information if found within the
            database.
     """
-    return serve_by_key(key)
     return serve_by_key(key)
 
 
@@ -161,7 +152,6 @@ def store_structure(upload_information: UploadInformation) -> dict:
     dict : A dictionary returning whether the file was succesffuly stored
            or not.
     """
-    return store(upload_information)
     return store(upload_information)
 
 

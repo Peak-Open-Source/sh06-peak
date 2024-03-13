@@ -23,11 +23,16 @@ class UploadInformation(BaseModel):
     ----------
 
     pdb_id : str
+
         The Protein Data Bank ID of the uploaded protein file. This is
         a unique identifier.
+
     sequence : str
+
         The protein structure sequence of the uploaded protein file.
+
     file_content : str
+
         The full text contents of the uploaded protein file. Stored so
         that the file can be dynamically recreated on the server even
         after restart.
@@ -36,10 +41,12 @@ class UploadInformation(BaseModel):
     -------
 
     clean() -> None:
+
         Destroys any existing folder that contains information with the
         same PDB ID.
 
     store() -> None:
+    
         Creates a new .ent file containing the contents of the uploaded
         PDB file. If a corresponding folder for the PDB ID does not exist,
         one is created - otherwise, the existing folder is wiped before

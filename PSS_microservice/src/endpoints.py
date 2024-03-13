@@ -28,9 +28,10 @@ def get_best_uniprot(uniprot_id: str, no_cache: bool = False):
             else "SequenceNotFound"
             }
     raw_uniprot_data = uniprot_parser.get_raw_uniprot_data(uniprot_id)
-    valid_references = raw_uniprot_data[0]
-    sequence = raw_uniprot_data[1]
-    if 'code' not in valid_references:  # If it didn't throw an error
+
+    if 'code' not in raw_uniprot_data:  # If it didn't throw an error
+        valid_references = raw_uniprot_data[0]
+        sequence = raw_uniprot_data[1]
         # Combine the dictionaries
         parsed_proteins = uniprot_parser.parse_uniprot_data(valid_references)
         best_structure = select_best_structure(parsed_proteins)

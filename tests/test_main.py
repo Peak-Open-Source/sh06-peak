@@ -4,7 +4,7 @@ from mongoengine import connect, disconnect
 from context import Protein
 from context import app
 from context import models
-from context import select_best_structure, calculate_score
+from context import select_best_structure
 
 import os.path
 import shutil

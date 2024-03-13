@@ -43,6 +43,7 @@ WEB_URL = environ.get('WEB_URL')
 def test_models():
     print("passed")
 
+
 """
 This file contains tests for the functions in the models.py file.
 

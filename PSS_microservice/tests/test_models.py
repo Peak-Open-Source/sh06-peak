@@ -96,7 +96,6 @@ def test_delete_file_by_sequence():
     # check if protein is deleted from the database
     try:
         result = search(seq, "Sequence")
-
     except DoesNotExist:
         result = None
 

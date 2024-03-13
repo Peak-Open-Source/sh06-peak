@@ -8,42 +8,6 @@ from src.models import write_to_database, delete_file, search, update_structure,
 load_dotenv()
 WEB_URL = environ.get('WEB_URL')
 
-# class TestDatabase():
-
-# def setUp(self):
-#     # Connect to the test database
-#     connect('TestDatabase', host="")  # noqa:E501
-# def tearDown(self):
-#     # Disconnect from the database
-#     disconnect()
-
-# def test_write_to_database_existing_seq(self):
-#     # test writing a new protein with an existing sequence
-#     seq = "ABCDE"
-#     pdb = "test_pdb"
-#     url = "http://example.com"
-#     write_to_database(seq, pdb, url)
-
-#     # check if the protein is updated in the database
-#     result = ProteinCollection.objects.get(Sequence=seq)
-#     self.assertEqual(result.PDB, pdb)
-
-# def test_write_to_database_existing_pdb(self):
-#     # test writing a new protein with an existing pdb
-#     seq = "ABCDE"
-#     pdb = "test_pdb"
-#     url = "http://example.com"
-#     write_to_database(seq, pdb, url)
-
-#     # check if the protein is updated in the database
-#     result = ProteinCollection.objects.get(PDB=pdb)
-#     self.assertEqual(result.Sequence, seq)
-
-
-def test_models():
-    print("passed")
-
-
 """
 This file contains tests for the functions in the models.py file.
 

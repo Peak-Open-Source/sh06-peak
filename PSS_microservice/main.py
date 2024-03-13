@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse, RedirectResponse
 import src.models as models  # noqa:F401
 from src.helpers import UploadInformation
 from src.endpoints import (base, get_best_uniprot, download_pdb_on_server,
@@ -9,7 +10,7 @@ app = FastAPI()
 
 # function to check your app is running :)
 @app.get("/")
-def run_check():
+def run_check() -> RedirectResponse:
     """
     Default return when no endpoint is called
     """
@@ -18,7 +19,7 @@ def run_check():
 
 
 @app.get('/retrieve_by_uniprot_id/{uniprot_id}')
-def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False):
+def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False) -> dict:
     """
     With a given Uniprot ID, gathers all PDB information from
     the Uniprot DB, and then calculates the best one from
@@ -47,7 +48,7 @@ def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False):
 
 
 @app.get('/fetch_pdb_by_id/{pdb_id}')
-def fetch_pdb_by_id(pdb_id: str):
+def fetch_pdb_by_id(pdb_id: str) -> dict:
     """
     Downloads the corresponding PDB file from the EBI API onto
     the server to be later served to the user.
@@ -68,7 +69,7 @@ def fetch_pdb_by_id(pdb_id: str):
 
 
 @app.get("/download_pdb/{pdb_id}")
-def download_pdb(pdb_id: str):
+def download_pdb(pdb_id: str) -> FileResponse | dict:
     """
     Allows users to download a stored PDB file to their
     local machine. If the file does not exist on the server,
@@ -89,7 +90,7 @@ def download_pdb(pdb_id: str):
 
 # Endpoint to retrieve protein structures by sequence
 @app.get('/retrieve_by_sequence/{sequence}')
-def retrieve_by_sequence(sequence: str):
+def retrieve_by_sequence(sequence: str) -> dict:
     """
     Retrieves the protein database information for a protein entry
     with the specified sequence.
@@ -111,7 +112,7 @@ def retrieve_by_sequence(sequence: str):
 
 # Endpoint to retrieve sequence structures by key
 @app.get('/retrieve_by_key/{key}')
-def retrieve_by_key(key: str):
+def retrieve_by_key(key: str) -> dict:
     """
     Retrieves the protein database information for a protein entry
     with the specified primary key.
@@ -133,7 +134,7 @@ def retrieve_by_key(key: str):
 
 # Endpoint to store protein structures
 @app.post('/store')
-def store_structure(upload_information: UploadInformation):
+def store_structure(upload_information: UploadInformation) -> dict:
     """
     Stores an uploaded PDB file's information by instantiating it
     on the server and storing it in the database. If a PDB with the

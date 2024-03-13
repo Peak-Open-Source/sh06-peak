@@ -46,7 +46,7 @@ class UploadInformation(BaseModel):
         same PDB ID.
 
     store() -> None:
-    
+
         Creates a new .ent file containing the contents of the uploaded
         PDB file. If a corresponding folder for the PDB ID does not exist,
         one is created - otherwise, the existing folder is wiped before

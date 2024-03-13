@@ -33,7 +33,7 @@ def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False):
         best PDB for.
 
     no_cache : bool?
-    
+
         An optional flag that dictates whether or not the returned
         protein should be the cached result or not.
 

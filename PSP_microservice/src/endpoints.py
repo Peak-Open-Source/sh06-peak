@@ -16,35 +16,7 @@ sequence_lock = threading.Lock()
 
 
 def test_running():
-    html_content = """
-    <html>
-        <head>
-            <title>AlphaFold API</title>
-        </head>
-        <body>
-            <h1>AlphaFold API</h1>
-            <p>running :)</p>
-            <h2>Endpoints:</h2>
-            <ul>
-                <li><strong>Predict Protein Structure:</strong>
-                Endpoint to predict protein structure. /predict
-                Go to endpoint</li>
-                <li><strong>Get Predicted Data:</strong>
-                Endpoint to retrieve predicted data./get_predicted/qualifier
-                </li>
-                <li><strong>Get AlphaFold Sequence:</strong>
-                Endpoint to retrieve AlphaFold sequence.
-                /get_sequence/qualifier</li>
-                <li><strong>Check Task Status:</strong>
-                Endpoint to check task status. /task/task_id </li>
-                <li><strong>Show Structure:</strong>
-                Endpoint to show protein structure.
-                /showstruct/qualifier </li>
-            </ul>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content, status_code=200)
+    return RedirectResponse(url="/docs")
 
 
 def retrieve_alphafold_prediction(qualifier):

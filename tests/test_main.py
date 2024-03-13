@@ -12,12 +12,6 @@ import shutil
 client = TestClient(app)
 
 
-def test_default_response():
-    response = client.get('/')
-    assert response.status_code == 200
-    assert response.json() == {"message": "running! :)"}
-
-
 class TestProtein():
 
     def test_overlap(self):

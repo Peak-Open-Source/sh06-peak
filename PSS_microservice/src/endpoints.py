@@ -3,7 +3,7 @@ import tarfile
 import os
 import requests
 
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 
 from src.helpers import select_best_structure, UploadInformation
 import src.uniprot_parser as uniprot_parser
@@ -15,7 +15,7 @@ pdb_sequences = {}
 
 
 def base():
-    return {"message": "running! :)"}
+    return RedirectResponse(url="/docs")
 
 
 def get_best_uniprot(uniprot_id: str, no_cache: bool = False):

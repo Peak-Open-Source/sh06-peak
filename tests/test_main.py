@@ -176,3 +176,30 @@ class TestBestStructure():
         best_structure = select_best_structure([protein_alpha,
                                                 protein_not_alpha])
         assert best_structure == protein_not_alpha.as_dict()
+
+    def test_method_weight(self):
+        protein_em = Protein(id=1, method="EM", resolution=2.0,
+                             coverage=75)
+        protein_nmr = Protein(id=2, method="NMR", resolution=2.0,
+                              coverage=75)
+        best_structure = select_best_structure([protein_em,
+                                                protein_nmr])
+        assert best_structure == protein_nmr.as_dict()
+
+    def test_resolution_weight(self):
+        protein_small_res = Protein(id=1, method="EMR", resolution=0.1,
+                                    coverage=75)
+        protein_big_res = Protein(id=2, method="EMR", resolution=2.0,
+                                  coverage=75)
+        best_structure = select_best_structure([protein_small_res,
+                                                protein_big_res])
+        assert best_structure == protein_small_res.as_dict()
+
+    def test_coverage_weight(self):
+        protein_small_cov = Protein(id=1, method="EMR", resolution=1.0,
+                                    coverage=75)
+        protein_big_cov = Protein(id=2, method="EMR", resolution=2.0,
+                                  coverage=300)
+        best_structure = select_best_structure([protein_small_cov,
+                                                protein_big_cov])
+        assert best_structure == protein_big_cov.as_dict()

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 # Additional penalty applied to AlphaFold entries to make them chosen less
 ALPHAFOLD_PENALTY = .1
+RES_UPPER = 8
 
 
 class UploadInformation(BaseModel):
@@ -120,13 +121,13 @@ def calculate_score(protein: Protein) -> float:
     # getting the method score, if other then get 0
     method_score = method_weights.get(protein.method, 0)
     coverage_score = protein.coverage
-    resolution_score = protein.resolution
+    resolution_score = RES_UPPER - float(protein.resolution)
 
     # scoring based on formula:
     # a * (method score) + b * (% coverage score) + c * (resolution score)
     score = ((method_weight * method_score) +
              (coverage_weight * coverage_score) +
-             (resolution_weight * float(resolution_score)))
+             (resolution_weight * resolution_score))
 
     if protein.is_alphafold:
         score -= ALPHAFOLD_PENALTY

@@ -70,6 +70,7 @@ class TestClient():
         path = f"{os.getcwd()}/{structure_id.lower()}"
         assert os.path.exists(path)
         shutil.rmtree(path)
+        models.delete_file(structure_id.lower(), "PDB")
         assert not os.path.exists(path)
 
     def test_fetch_invalid(self):
@@ -95,6 +96,7 @@ class TestClient():
             assert len(f.read()) > 50
         os.remove(path + ".ent")
         shutil.rmtree(path)
+        models.delete_file(structure_id.lower(), "PDB")
         assert not os.path.exists(path)
 
     def test_upload_file(self):

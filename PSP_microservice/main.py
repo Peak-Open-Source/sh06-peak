@@ -38,6 +38,7 @@ async def predict_endpoint(sequence: str):
     Parameters
     ----------
     sequence : String
+
         The sequence inputed by the user to make the prediction with
 
     Returns
@@ -50,6 +51,19 @@ async def predict_endpoint(sequence: str):
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
+      """
+    Endpoint to check the task status.
+
+    Parameters
+    ----------
+    sequence : String
+
+        The taskID provided when a sequence is queued
+
+    Returns
+    -------
+    status: current status of the task requested
+    """
     return get_task_status(task_id)
 
 
@@ -62,6 +76,7 @@ def get_prediction(qualifier):
     Parameters
     ----------
     qaulifier  : String
+
         The uniprot qualifier given by the user.
 
     Returns
@@ -80,6 +95,7 @@ def get_alphafold_sequence(qualifier):
     Parameters
     ----------
     qaulifier  : String
+
         The uniprot qualifier given by the user.
 
     Returns
@@ -98,6 +114,7 @@ def show_structure(qualifier):
     Parameters
     ----------
     qaulifier  : String
+
         The uniprot qualifier given by the user.
 
     Returns

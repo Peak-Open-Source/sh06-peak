@@ -68,19 +68,4 @@ def test_3D_model_redirect_():
     assert response.url == 'https://alphafold.ebi.ac.uk/entry/P00420'
 
 
-# def test_predict_queue_task_1():
-#     test_seq = "MTHLERSRILWFRDIVAEATYLGDHTMFLNTIILAFTISDGVYGSVFYAGTGLHFLHMVMLAAMLGVNYWRMRNYHLTAGHHVGYETTIIYTHVLDVIWLFLYVVFYWWGV"  # noqa: E501
-#     result = predict_protein_structure.delay(test_seq)
-#     assert result.status == "PENDING"
 
-
-# def test_predict_queue_task_2():
-#     sequence = "IGVSEATRIDPNAWVERWKAAGHYQAEAALLQCTADTLADAVLITTAHAWQHQGKTLFISRKTYRIDGSGQMAITVDVEVASDTPHPARIGLNCQLAQVAERVNWLGLGPQENYPDRLTAACFDRWDLPLSDMYTPYVFPSENGLRCGTRELNYGPHQWRGDFQFNISRYSQQQLMETSHRHLLHAEEGTWLNIDGFHMGIGGDDSWSPSVSAEFQLSAGRYHYQ"  # noqa: E501
-#     result = predict_protein_structure.delay(sequence)
-#     assert result.status == "PENDING"
-
-
-# def test_get_status():
-#     sequence = "QHQGKTLFISRKTYRIDGSGQMAITVDVEVASDTPHPARIGLNCQLAQVAERVNWLGLGPQENYPDRLTAACFDRWDLPLSDMYTPYVFPSENGLRCGTRELNYGPHQWRGDFQFNISRYSQQQLMETSHRHLLHAEEGTWLNIDGFHMGIGGDDSWSPSVSAEFQ"  # noqa: E501
-#     result = async_predict(sequence)
-#     assert result["in_queue"]

@@ -95,5 +95,9 @@ release_main:
     tag_name: 'v0.$CI_PIPELINE_IID'                # The version is incremented per pipeline.
     description: 'v0.$CI_PIPELINE_IID'
     ref: '$CI_COMMIT_SHA'   
+    assets:
+      links:
+        - name: 'CLI'
+          url: './temp/linux/dist/ProteinCLI'
   artifacts:
-    paths: [./temp/linux/dist/ProteinCLI]    # The tag is created from the pipeline SHA.
+    paths: ['./temp/linux/dist/ProteinCLI']    # The tag is created from the pipeline SHA.

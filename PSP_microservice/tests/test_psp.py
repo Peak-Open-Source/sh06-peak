@@ -8,14 +8,6 @@ sys.path.append("..")
 client = TestClient(app)
 
 
-@pytest.fixture(scope='session')
-def celery_config():
-    return {
-        'broker_url': 'pyamqp://guest@localhost:5672//',
-        'result_backend': 'rpc://',
-    }
-
-
 def test_default_response():
     response = client.get('/')
     assert response.status_code == 200

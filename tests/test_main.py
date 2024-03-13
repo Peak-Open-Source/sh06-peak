@@ -168,9 +168,10 @@ class TestBestStructure():
         assert best_structure == protein_xray.as_dict()
 
     def test_tiebreaker(self):
-        protein_alpha = Protein(id=1, method="Other", resolution=2.0, coverage=75)
+        protein_alpha = Protein(id=1, method="Other", resolution=2.0,
+                                coverage=75)
         protein_alpha.is_alphafold = True
-        protein_not_alpha = Protein(id=2, method="Other", resolution=2.0, 
+        protein_not_alpha = Protein(id=2, method="Other", resolution=2.0,
                                     coverage=75)
         best_structure = select_best_structure([protein_alpha,
                                                 protein_not_alpha])

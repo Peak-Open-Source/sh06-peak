@@ -15,6 +15,8 @@ run_tests:
     - python -m venv venv
     - source venv/bin/activate
     - pip install -r ./requirements.txt
+    - docker pull rabbitmq:3-management
+    - docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
   
   script:
     - pytest tests
@@ -25,6 +27,8 @@ run_tests:
     - branches  
   except:
     - master 
+
+
 
 # build_image:
 #   stage: build

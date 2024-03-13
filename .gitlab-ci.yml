@@ -10,6 +10,11 @@ run_tests:
   stage: test
   
   image: python:$PYTHON_VERSION
+  services:
+   - rabbitmq:latest
+
+  variables:
+    RABBITMQ_DEFAULT_PORT: 5672
   
   before_script:
     - python -m venv venv
@@ -25,6 +30,8 @@ run_tests:
     - branches  
   except:
     - master 
+
+
 
 # build_image:
 #   stage: build

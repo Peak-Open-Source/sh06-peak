@@ -13,11 +13,38 @@ port = (input("Please enter the corresponding\
 while not port.isnumeric():
     port = input("Please enter the corresponding port \
                  for the PSS Microservice: ")
+
+# Create an assistant class to help with http requests
 client = PSSClient(ip, int(port))
 running = True
 
 
 class Command():
+    """
+    A class used to represent and control each individual
+    command in the CLI, along with any relevant information.
+
+    Attributes
+    ----------
+    name : str
+        The name of the command.
+    description : str
+        The description of the command, detailing how to use and what it does.
+    number_of_args : int
+        The number of arguments to be passed into the command's function
+    method : func
+        The method to be called when running the command.
+
+    Methods
+    -------
+
+    Command(name: str, description: str, func: func, num_args: int?):
+        Constructor for the class, taking all attributes as parameters.
+
+    print():
+        Prints the name and description of the command in an easy to
+        read format.
+    """
     def __init__(self, name: str, description: str, func, num_args: int = 0):
         self._name = name
         self._description = description
@@ -41,6 +68,16 @@ class Command():
 
 
 def get_by_key(key: str):
+    """
+    Calls the retrieve by key endpoint, and if it receives results,
+    downloads the PDB to the user's current working directory.
+
+    Parameters
+    ----------
+
+    key : str
+        The key to search the database for.
+    """
     protein_info, success = client.get("retrieve_by_key", [key])
     if not success or protein_info["status"] == 404:
         print("Retrieve by key failed - are you sure the key is valid?")
@@ -56,6 +93,16 @@ def get_by_key(key: str):
 
 
 def get_by_sequence(seq: str):
+    """
+    Calls the retrieve by sequence endpoint, and if it receives results,
+    downloads the PDB to the user's current working directory.
+
+    Parameters
+    ----------
+
+    seq : str
+        The sequence to search the database for.
+    """
     protein_info, success = client.get("retrieve_by_sequence", [seq])
     if not success or protein_info["status"] == 404:
         print("Retrieve by sequence failed - are you sure the sequence is valid?")  # noqa: E501
@@ -71,6 +118,17 @@ def get_by_sequence(seq: str):
 
 
 def get_best_uniprot(id: str):
+    """
+    Calls the retrieve by uniprot id, which finds the best associated
+    PDB file. If a valid PDB exist, it downloads it on the server, and
+    then downloads it locally to the user.
+
+    Parameters
+    ----------
+
+    id : str
+        The Uniprot ID to search Uniprot for, finding the best PDB.
+    """
     best_uniprot, success = client.get("retrieve_by_uniprot_id", [id])
     if not success:
         print("Invalid Uniprot ID")
@@ -96,6 +154,9 @@ def get_best_uniprot(id: str):
 
 
 def get(type: str, id: str):
+    """
+    Calls the associated function for the selected command.
+    """
     if type == "uniprot":
         get_best_uniprot(id)
     elif type == "key":
@@ -105,14 +166,29 @@ def get(type: str, id: str):
 
 
 def store(file_path: str, pdb_id: str, sequence: str):
+    """
+    Loads the given file path if possible, then sends the corresponding
+    file content, PDB ID, and sequence to the server.
+
+    Parameters
+    ----------
+
+    file_path : str
+        The path of the file to load.
+    pdb_id : str
+        The ID of the uploaded PDB.
+    sequence : str
+        The corresponding sequence of the uploaded PDB.
+
+    """
     try:
         with open(file_path, "r") as pdb_file:
             byte_info = pdb_file.read()
-            result, success = client.post("store",
-                                          {
+            result, success = client.post("store", {
                                               "pdb_id": pdb_id,
                                               "sequence": sequence,
-                                              "file_content": byte_info})
+                                              "file_content": byte_info}
+                                          )
             if "success" in result and result["success"]:
                 print("Upload successful!")
             else:
@@ -146,7 +222,9 @@ COMMANDS = {
             \"get [database_type] [id]\"\
             \nFetches and downloads best PDB from appropriate database.\
             \nValid database_type: uniprot, key, sequence\
-            \nExample Usage: get uniprot P12319",
+            \nExample Usage: get uniprot P12319\
+            \nExample Usage: get key a5b3c2\
+            \nExample Usage: get sequence abababababa",
         get,
         2
     ),
@@ -169,6 +247,17 @@ COMMANDS = {
 
 
 def get_command(command_args):
+    """
+    Takes a list of command arguments, finds the corresponding command value,
+    and then runs the command with the remaining arguments.
+
+    Parameters
+    ----------
+
+    command_args : list[str]
+        A list of all arguments to be used for the command. The first argument
+        is the alias of the command being executed.
+    """
     target = command_args[0]
     if target in COMMANDS:
         command = COMMANDS[target]
@@ -177,6 +266,16 @@ def get_command(command_args):
 
 
 def process(command):
+    """
+    Wrapper method to provide validation and error handling
+    to user-inputted commands.
+
+    Parameters
+    ----------
+
+    command : list[str]
+        A list of all arguments to be used for command logic.
+    """
     if len(command) < 1:
         help()
     else:
@@ -188,6 +287,7 @@ def process(command):
                   and that the Microservice is online.")
 
 
+# The CLI can be ran from the commmand line, so need to handle sysargs.
 if len(sys.argv) >= 3:
     host = sys.argv[1]
     port = sys.argv[2]

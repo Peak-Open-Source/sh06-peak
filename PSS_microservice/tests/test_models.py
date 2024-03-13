@@ -1,13 +1,18 @@
 from mongoengine import DoesNotExist, connect, disconnect
+from dotenv import load_dotenv
+from os import environ
 import sys
 sys.path.append("PSS_microservice/")
 from src.models import write_to_database, delete_file, search, update_structure, ProteinCollection  # noqa:E501,E402
+
+load_dotenv()
+WEB_URL = environ.get('WEB_URL')
 
 # class TestDatabase():
 
 # def setUp(self):
 #     # Connect to the test database
-#     connect('TestDatabase', host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority")  # noqa:E501
+#     connect('TestDatabase', host="")  # noqa:E501
 # def tearDown(self):
 #     # Disconnect from the database
 #     disconnect()
@@ -96,7 +101,6 @@ def test_delete_file_by_sequence():
     # check if protein is deleted from the database
     try:
         result = search(seq, "Sequence")
-
     except DoesNotExist:
         result = None
 
@@ -129,7 +133,7 @@ def test_delete_file_by_key():
     url = "http://exampledelete.com"
     write_to_database(seq, pdb, url)
     connect('ProteinDatabase',
-            host="mongodb+srv://proteinLovers:protein-Lovers2@cluster0.pbzu8xb.mongodb.net/?retryWrites=true&w=majority",  # noqa: E501
+            host=WEB_URL,  # noqa: E501
             uuidRepresentation="standard")
     key = ProteinCollection.objects.get(Sequence=seq).id
     disconnect()

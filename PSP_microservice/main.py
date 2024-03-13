@@ -51,7 +51,7 @@ async def predict_endpoint(sequence: str):
 
 @app.get("/task/{task_id}")
 async def read_task(task_id: str):
-      """
+    """
     Endpoint to check the task status.
 
     Parameters

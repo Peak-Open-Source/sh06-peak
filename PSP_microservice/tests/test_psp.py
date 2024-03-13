@@ -1,6 +1,4 @@
-import pytest
-from main import app, get_prediction, get_alphafold_sequence, predict_endpoint, read_task
-from src.endpoints import predict_protein_structure, async_predict, get_task_status  # noqa: E501
+from main import app, get_prediction, get_alphafold_sequence
 from fastapi.testclient import TestClient
 import sys
 
@@ -66,6 +64,3 @@ def test_3D_model_redirect_P00722():
 def test_3D_model_redirect_():
     response = client.get('/showstruct/P00420')
     assert response.url == 'https://alphafold.ebi.ac.uk/entry/P00420'
-
-
-

@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 import json
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import RedirectResponse
 from celery import Celery
 from celery.result import AsyncResult
 import time

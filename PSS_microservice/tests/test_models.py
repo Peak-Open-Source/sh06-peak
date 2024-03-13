@@ -44,8 +44,21 @@ def test_models():
     print("passed")
 
 
+"""
+This file contains tests for the functions in the models.py file.
+
+Each test:
+1) Writes a test file to the database
+2) Tests the function
+3) Deletes the file written for testting
+"""
+
+
 def test_search_sequence():
-    # test searching for a protein by sequence using the search function
+    """
+    The function `test_search_sequence` tests searching for a
+    protein by sequence using a search function.
+    """
     seq = "SEARCHSEQ"
     pdb = "search_seq_pdb"
     url = "http://searchseq.com"
@@ -56,7 +69,10 @@ def test_search_sequence():
 
 
 def test_search_pdb():
-    # test searching for a protein by pdb using the search function
+    """
+    The function `test_search_pdb` tests searching for a
+    protein by PDB using the search function.
+    """
     seq = "SEARCHPDB"
     pdb = "search_pdb_pdb"
     url = "http://searchpdb.com"
@@ -67,16 +83,27 @@ def test_search_pdb():
 
 
 def test_search_key():
-
-    key = '65c3cc07d603c8bb41f7a5d0'
+    """
+    The function `test_search_key` tests searching for a
+    protein by key using a search function.
+    """
+    seq = "SEARCHKEY"
+    pdb = "search_key"
+    url = "/search_key/123"
+    write_to_database(seq, pdb, url)
+    key = search(seq, "Sequence").id
 
     result = search(key, "Key")
-    assert str(result.id) == key, "Protein unsuccessfully found by key"
+    assert str(result.id) == str(key), "Protein unsuccessfully found by key"
 
 
 def test_update_structure():
-    # test updating structure in database
-    seq = "update_me"
+    """
+    The function `test_update_structure` tests updating a
+    structure in a database by writing a new structure,
+    updating it, and then verifying the update and deletion.
+    """
+    seq = "UPDATEPDB"
     pdb = "update_pdb"
     url = "http://update.com"
     write_to_database(seq, pdb, url)
@@ -90,8 +117,11 @@ def test_update_structure():
 
 
 def test_delete_file_by_sequence():
-    # test deleting a protein by sequence
-    seq = "delete_me"
+    """
+    The function `test_delete_file_by_sequence` tests
+    the deletion of a protein file by sequence from a database.
+    """
+    seq = "DELETEME"
     pdb = "test_pdb"
     url = "http://example.com"
     write_to_database(seq, pdb, url)
@@ -108,10 +138,13 @@ def test_delete_file_by_sequence():
 
 
 def test_delete_file_by_pdb():
-    # test deleting a protein by pdb
-    seq = "ABCDE"
-    pdb = "test_delete_pdb"
-    url = "http://example.com"
+    """
+    The function `test_delete_file_by_pdb` tests
+    the deletion of a protein file by PDB identifier from a database.
+    """
+    seq = "DELETEPDB"
+    pdb = "test_delete_me"
+    url = "/delete_by_pds/123"
     write_to_database(seq, pdb, url)
 
     delete_file(pdb, "PDB")
@@ -127,8 +160,12 @@ def test_delete_file_by_pdb():
 
 
 def test_delete_file_by_key():
-    # test deleting a protein by key
-    seq = "key_delete"
+    """
+    The function `test_delete_file_by_key` tests
+    the deletion of a protein file from a database using a
+    specific key.
+    """
+    seq = "DELETEKEY"
     pdb = "test_key_delete_pdb"
     url = "http://exampledelete.com"
     write_to_database(seq, pdb, url)
@@ -151,8 +188,12 @@ def test_delete_file_by_key():
 
 
 def test_write_to_database_new_protein():
-    # test writing a completely new protein
-    seq = "ABCDE"
+    """
+    The function `test_write_to_database_new_protein` tests
+    writing a completely new protein to a database and verifies its
+    storage and deletion.
+    """
+    seq = "NEWPROTEIN"
     pdb = "new_pdb"
     url = "http://example.com"
     write_to_database(seq, pdb, url)

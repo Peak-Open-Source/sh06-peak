@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import HTTPException
 import json
 from fastapi.responses import RedirectResponse, HTMLResponse
 from celery import Celery
@@ -8,7 +8,7 @@ import threading
 import requests
 
 celery = Celery('tasks')
-celery.config_from_object('celery_config')
+celery.config_from_object('src.celery_config')
 # creating a threadsafe dictonary to store current sequences
 sequence_task_status = {}
 # lock for dictionary

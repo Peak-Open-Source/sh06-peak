@@ -28,9 +28,12 @@ def retrieve_by_uniprot_id(uniprot_id: str, no_cache: bool = False):
     Parameters
     ----------
     uniprot_id : str
+
         The specified Uniprot ID that the user wants to find the
         best PDB for.
+
     no_cache : bool?
+
         An optional flag that dictates whether or not the returned
         protein should be the cached result or not.
 
@@ -52,6 +55,7 @@ def fetch_pdb_by_id(pdb_id: str):
     Parameters
     ----------
     pdb_id : str
+
         The ID of the PDB to be downloaded on the server.
 
     Returns
@@ -73,6 +77,7 @@ def download_pdb(pdb_id: str):
     Parameters
     ----------
     pdb_id : str
+
         The ID of the PDB file to be downloaded from the server.
 
     Returns
@@ -92,6 +97,7 @@ def retrieve_by_sequence(sequence: str):
     Parameters
     ----------
     sequence : str
+
         The protein sequence to be searched for within the database.
 
     Returns
@@ -113,6 +119,7 @@ def retrieve_by_key(key: str):
     Parameters
     ----------
     key : str
+
         The primary key to be searched for within the database.
 
     Returns
@@ -135,6 +142,7 @@ def store_structure(upload_information: UploadInformation):
     Parameters
     ----------
     upload_information : UploadInformation
+
         The JSON POST information on all of the file contents, including
         PDB ID, sequence, and the contents of the file.
 

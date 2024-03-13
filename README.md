@@ -13,6 +13,8 @@ All workloads of the application must run as containers, originally in Docker ho
 
 The application should be accessed via REST API or a python script/compiled binary
 
+## Endpoint Documentation
+For precise endpoint documentation, including the format required for each endpoint, visit the /docs page when hosting the project. If you are navigating the PSS, the default page with no endpoint should redirect to the docs.
 
 ## Useful Commands
 

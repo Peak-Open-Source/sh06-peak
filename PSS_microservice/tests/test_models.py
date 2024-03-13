@@ -94,7 +94,7 @@ def test_search_key():
     key = search(seq, "Sequence").id
 
     result = search(key, "Key")
-    assert str(result.id) == key, "Protein unsuccessfully found by key"
+    assert str(result.id) == str(key), "Protein unsuccessfully found by key"
 
 
 def test_update_structure():

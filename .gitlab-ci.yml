@@ -10,6 +10,9 @@ run_tests:
   stage: test
   
   image: python:$PYTHON_VERSION
+  services:
+   - docker:24-dind
+
   
   before_script:
     - python -m venv venv

@@ -7,8 +7,9 @@ import time
 import threading
 import requests
 
-celery = Celery('tasks')
-celery.config_from_object('src.celery_config')
+
+celery = Celery('tasks', broker="pyamqp://guest@localhost:5672//", result_backend="rpc://")  # noqa: E501
+
 # creating a threadsafe dictonary to store current sequences
 sequence_task_status = {}
 # lock for dictionary
@@ -64,10 +65,10 @@ def predict_protein_structure(sequence):
         sequence_task_status[sequence] = 'PENDING'
 
     # for testing
-    time.sleep(60)
+    time.sleep(20)
 
     # TODO use alphafold to predict the protien and then return the sequence
-    predicted_structure = "prediction"
+    predicted_structure = "ALPHAFOLD PREDICTION"
     # remove task from queue after prediction has completed
     with sequence_lock:
         sequence_task_status.pop(sequence)

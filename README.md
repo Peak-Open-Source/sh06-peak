@@ -12,6 +12,7 @@ The application should can be accessed via REST API or a python script/compiled 
 
 A possible future development is querying to a protein prediction service:
 If a query for a protein structure is unsuccesful because it is not found in a known database, a request to predict the protein structure should be sent to AlphaFold2. These predictions are resource intensive so distributing tasks to multiple workers should be done where possible. It is also important to avoid queueing a request for a protein prediction that is in the process of being requested.
+Currently a task queing system is set up using rabbitMQ as a broker and celery to queue the tasks. Requests can bee made through the REST API and the status of tasks can also be checked here.
 
 ## Prerequsites
 
@@ -21,7 +22,7 @@ If a query for a protein structure is unsuccesful because it is not found in a k
 
 - Docker and Docker Compose for running the service as a contained process
 
-## Installation Guide
+## Installation Guide - Protien Structure Storage Service
 
 Clone the repository
 
@@ -46,7 +47,7 @@ The CLI can also be compiled into a machine specific executable using PyInstalle
 pyinstaller cli/ProteinClient.py
 ```
 
-## User Guide
+## User Guide - Protien Structure Storage Service
 
 The service can be interacted with using the CLI or through OpenAPI endpoints.
 
@@ -68,7 +69,7 @@ The service can be interacted with using the CLI or through OpenAPI endpoints.
 
 For precise endpoint documentation, including the format required for each endpoint, visit the `/docs` page when hosting the project.
 
-### CLI
+### CLI - Protien Structure Storage Service
 
 `get [database] [id]` - Fetches and downloads best PDB from appropriate database to your local directory.
 
@@ -81,6 +82,35 @@ Valid database requests are
 `store [file_path] [pdb_id] [sequence]` - Uploads a pdb file to the service database.
 
 Example: `store pdbs/A123.ent P05067 MLPGLALLLLAAWTARAL`
+
+## Installation Guide - Protien Structure Prediction Service
+Clone the repository
+To run locally with celery workers
+```
+python PSP_microservice/main.py
+```
+```
+celery -A src.endpoints worker --pool=solo -l info
+```
+## User Guide - Protien Structure Prediction Service
+
+The service can be interacted through OpenAPI endpoints.
+### OpenAPI
+`GET /predict` - Allows you to make a request for a prediction, you can pass in your sequence to the API through the endpoint
+```
+/predict/?sequence={sequence}
+```
+`GET /task/{task_id}` - shows the status of the requested task.
+
+`GET /get_predicted/{qualifier}` - fetches already predicted protiens from the Alphafold database.
+
+`GET /get_sequence/{qualifier}` - fetches the sequence of the requested protein
+
+`GET /showstruct/{qualifier}` - fetches the 3D model of the requested protein
+
+#### Endpoint Documentation
+
+For precise endpoint documentation, including the format required for each endpoint, visit the `/docs` page when hosting the project.
 
 ## Project File Structure
 

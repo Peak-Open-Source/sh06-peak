@@ -1,8 +1,10 @@
 ## Reporting Bugs And Issues
 
+Ensure that the bug or issue has not already been reported before opening a new issue.
+
 If you are reporting a bug open a new issue with the bug label and write a short description of the bug.
 
-If you are suggesting a new feature or code then open a new issue with a short description of the suggestion and label it with the related subteam(s)
+If you are suggesting a new feature or code then open a new issue with a short description of the suggestion and label it with the feature label and the related subteam(s).
 
 ## Contributing Code
 

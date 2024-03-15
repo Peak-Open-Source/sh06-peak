@@ -1,17 +1,17 @@
 # SH06 Peak
 
 ## Project Overview
-SH06 is working with PEAK to develop a protein structure storage application that queries three external databases; AlphaFold, UniProt and EBI to serve protein structure files. 
 
-Real protein structures will be selected from UniProt which will then be used to extract data from the protein data bank (EBI).
-Already predicted structures will be gathered from AlphaFold using a weighting algorithm to select the 'best' prediction.
+SH06 is working with [PEAK](https://peak.scot) to develop a protein structure storage application that queries public external databases to serve protein structure files.
 
-If a query for a protein structure is unsuccesful because it is not found in a known database, a request to predict the protein structure should be sent to AlphaFold2. These predictions are resource intensive so distributing tasks to multiple workers should be done where possible. It is also important to avoid queueing a request for a protein prediction that is in the process of being requested
+Real protein structures are selected from UniProt using a weighting algorithm to select the 'best' structre which will then be used to extract the PDB data from the protein data bank (EBI). These structures are then stored in a database where the user can then download, alter, or upload new protein entries.
 
 All workloads of the application must run as containers, originally in Docker however this is expected to be expanded into a kubernetes cluster in the future.
 
-The application should be accessed via REST API or a python script/compiled binary
+The application should can be accessed via REST API or a python script/compiled binary.
 
+A possible future development is querying to a protein prediction service:
+If a query for a protein structure is unsuccesful because it is not found in a known database, a request to predict the protein structure should be sent to AlphaFold2. These predictions are resource intensive so distributing tasks to multiple workers should be done where possible. It is also important to avoid queueing a request for a protein prediction that is in the process of being requested.
 
 ## Prerequsites
 
@@ -25,17 +25,26 @@ The application should be accessed via REST API or a python script/compiled bina
 
 Clone the repository
 
-To run through a Docker container run 
+To run through a Docker container start Docker and run 
 ```
-git clone https://stgit.dcs.gla.ac.uk/team-project-h/2023/sh06/sh06-main.git
 cd PSS_microservice
 docker-compose up
 ```
 . This command will run any existing build if one exists; to avoid this, amend `--build` to the end of the command and force a build.
 
-To run locally `python PSS_microservice/main.py`
+To run locally
+```
+python PSS_microservice/main.py
+```
 
-To run the CLI in a separate terminal `python cli/ProteinClient.py`. The CLI can also be compiled into a machine specific executable using PyInstaller through `pyinstaller cli/ProteinClient.py`.
+To run the CLI in a separate terminal
+```
+python cli/ProteinClient.py
+``` 
+The CLI can also be compiled into a machine specific executable using PyInstaller
+```
+pyinstaller cli/ProteinClient.py
+```
 
 ## User Guide
 
@@ -57,17 +66,21 @@ The service can be interacted with using the CLI or through OpenAPI endpoints.
 
 #### Endpoint Documentation
 
-For precise endpoint documentation, including the format required for each endpoint, visit the /docs page when hosting the project.
+For precise endpoint documentation, including the format required for each endpoint, visit the `/docs` page when hosting the project.
 
 ### CLI
 
-`get [database] [id]` - 
+`get [database] [id]` - Fetches and downloads best PDB from appropriate database to your local directory.
 
-`store [file_path] [pdb_id] [sequence]`- 
+Valid database requests are
+- `get uniprot [uniprot_id]`
+- `get sequence [protein_sequence]`
+- `get key [database_entry_key]`
 
-### Testing
 
-`pytest --cov-report term-missing --cov=PSS_microservice`
+`store [file_path] [pdb_id] [sequence]` - Uploads a pdb file to the service database.
+
+Example: `store pdbs/A123.ent P05067 MLPGLALLLLAAWTARAL`
 
 ## Project File Structure
 
@@ -80,7 +93,7 @@ For precise endpoint documentation, including the format required for each endpo
     │   └── Dockerfile
     ├── PSS_microservice            # PSS source code
     │   ├── tests
-    │   ├── docker-compose.yml
+    │   ├── docker-compose.yml      # Used to host the process in a local container
     │   └── Dockerfile
     ├── tests  
     ├── .gitlab-ci.yml   
@@ -90,7 +103,11 @@ For precise endpoint documentation, including the format required for each endpo
 ## Contributing Guide
 
 
-## Resources
 
+## Resources
+
+[Uniprot](https://www.uniprot.org) API
+
+[EBI](https://www.ebi.ac.uk) API
 
 ## Contact

@@ -8,7 +8,7 @@ import threading
 import requests
 
 
-celery = Celery('tasks', broker="pyamqp://guest@localhost:5672//", result_backend = "rpc://")
+celery = Celery('tasks', broker="pyamqp://guest@localhost:5672//", result_backend="rpc://")  # noqa: E501
 
 # creating a threadsafe dictonary to store current sequences
 sequence_task_status = {}

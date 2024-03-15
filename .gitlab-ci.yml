@@ -4,13 +4,8 @@ stages:
   - build
   - release
 
-services:
-  - rabbitmq:management
 variables:
   PYTHON_VERSION: "3.11.7"
-  RABBITMQ_DEFAULT_USER: rabbitmq
-  RABBITMQ_DEFAULT_PASS: rabbitmq
-  RABBITMQ_DEFAULT_PORT: 5672
 
 run_linting:
   stage: lint
@@ -20,7 +15,7 @@ run_linting:
   script:
     - pip install flake8
     - flake8
-  
+
 run_tests:
   stage: test
   

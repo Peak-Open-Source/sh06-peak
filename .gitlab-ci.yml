@@ -6,7 +6,9 @@ stages:
 
 variables:
   PYTHON_VERSION: "3.11.7"
-  RABBITMQ_URI: "pyamqp://guest@rabbitmq:5672//"
+  RABBITMQ_DEFAULT_USER: guest
+  RABBITMQ_DEFAULT_PASS: guest
+  AMQP_URL: 'amqp://guest:guest@rabbitmq:5672'
 
 run_linting:
   stage: lint
@@ -18,8 +20,7 @@ run_linting:
     - flake8
 
 services:
-  - name: rabbitmq:3-management
-    alias: rabbitmq
+  - rabbitmq:latest
     
 run_tests:
   stage: test

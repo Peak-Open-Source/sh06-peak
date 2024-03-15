@@ -8,9 +8,9 @@ services:
   - rabbitmq:management
 variables:
   PYTHON_VERSION: "3.11.7"
-  RABBITMQ_DEFAULT_USER: guest
-  RABBITMQ_DEFAULT_PASS: guest
-  AMQP_URL: 'amqp://guest:guest@rabbitmq:5672'
+  RABBITMQ_DEFAULT_USER: rabbitmq
+  RABBITMQ_DEFAULT_PASS: rabbitmq
+  RABBITMQ_DEFAULT_PORT: 5672
 
 run_linting:
   stage: lint

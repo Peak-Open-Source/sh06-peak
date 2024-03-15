@@ -102,12 +102,10 @@ Example: `store pdbs/A123.ent P05067 MLPGLALLLLAAWTARAL`
 
 ## Contributing Guide
 
-
+See CONTRIBUTING.md
 
 ## Resources
 
 [Uniprot](https://www.uniprot.org) API
 
 [EBI](https://www.ebi.ac.uk) API
-
-## Contact

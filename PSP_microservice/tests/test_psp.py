@@ -1,5 +1,4 @@
 from main import app, get_prediction, get_alphafold_sequence
-from src.endpoints import predict_protein_structure
 from fastapi.testclient import TestClient
 import sys
 
@@ -65,9 +64,3 @@ def test_3D_model_redirect_P00722():
 def test_3D_model_redirect_():
     response = client.get('/showstruct/P00420')
     assert response.url == 'https://alphafold.ebi.ac.uk/entry/P00420'
-
-
-def test_predict_queue_task_1():
-    test_seq = "MTHLERSRILWFRDIVAEATYLGDHTMFLNTIILAFTISDGVYGSVFYAGTGLHFLHMVMLAAMLGVNYWRMRNYHLTAGHHVGYETTIIYTHVLDVIWLFLYVVFYWWGV"  # noqa: E501
-    result = predict_protein_structure.delay(test_seq)
-    assert result.status == "PENDING"

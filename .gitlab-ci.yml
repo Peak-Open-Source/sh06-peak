@@ -4,6 +4,8 @@ stages:
   - build
   - release
 
+services:
+  - rabbitmq:management
 variables:
   PYTHON_VERSION: "3.11.7"
   RABBITMQ_DEFAULT_USER: guest
@@ -18,10 +20,7 @@ run_linting:
   script:
     - pip install flake8
     - flake8
-
-services:
-  - rabbitmq:latest
-    
+  
 run_tests:
   stage: test
   

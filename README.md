@@ -92,7 +92,14 @@ python PSP_microservice/main.py
 ```
 celery -A src.endpoints worker --pool=solo -l info
 ```
-## User Guide - Protien Structure Prediction Service
+Also a rabbitMQ server needs to be hosted on port 5672 which can be pulled from a Docker image
+```
+docker pull rabbitmq:3-management
+```
+```
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+## User Guide - Protein Structure Prediction Service
 
 The service can be interacted through OpenAPI endpoints.
 ### OpenAPI
@@ -107,6 +114,14 @@ The service can be interacted through OpenAPI endpoints.
 `GET /get_sequence/{qualifier}` - fetches the sequence of the requested protein
 
 `GET /showstruct/{qualifier}` - fetches the 3D model of the requested protein
+
+### Docker
+```
+docker build -t psp .
+```
+```
+docker run -p 8000:8000 -it psp 
+```
 
 #### Endpoint Documentation
 

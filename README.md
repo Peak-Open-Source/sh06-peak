@@ -11,10 +11,10 @@ All workloads of the application must run as containers, originally in Docker ho
 The application should can be accessed via REST API or a python script/compiled binary.
 
 A possible future development is querying to a protein prediction service:
-If a query for a protein structure is unsuccesful because it is not found in a known database, a request to predict the protein structure should be sent to AlphaFold2. These predictions are resource intensive so distributing tasks to multiple workers should be done where possible. It is also important to avoid queueing a request for a protein prediction that is in the process of being requested.
-Currently a task queing system is set up using rabbitMQ as a broker and celery to queue the tasks. Requests can bee made through the REST API and the status of tasks can also be checked here.
+If a query for a protein structure is unsuccessful because it is not found in a known database, a request to predict the protein structure should be sent to AlphaFold2. These predictions are resource intensive so distributing tasks to multiple workers should be done where possible. It is also important to avoid queueing a request for a protein prediction that is in the process of being requested.
+Currently a task queueing system is set up using rabbitMQ as a broker and celery to queue the tasks. Requests can be made through the REST API and the status of tasks can also be checked here.
 
-## Prerequsites
+## Prerequisites
 
 - Python 3.11
 
@@ -22,7 +22,7 @@ Currently a task queing system is set up using rabbitMQ as a broker and celery t
 
 - Docker and Docker Compose for running the service as a contained process
 
-## Installation Guide - Protien Structure Storage Service
+## Installation Guide - Protein Structure Storage Service
 
 Clone the repository
 
@@ -47,15 +47,15 @@ The CLI can also be compiled into a machine specific executable using PyInstalle
 pyinstaller cli/ProteinClient.py
 ```
 
-## User Guide - Protien Structure Storage Service
+## User Guide - Protein Structure Storage Service
 
-The service can be interacted with using the CLI or through OpenAPI endpoints.
+The service can be interacted with using the CLI or through FastAPI endpoints.
 
 ### OpenAPI
 
-`GET /retrieve_by_uniprot_id/{uniprot_id}` - Fetch ID of best matching structre for a specified UniProt ID
+`GET /retrieve_by_uniprot_id/{uniprot_id}` - Fetch ID of best matching structure for a specified UniProt ID
 
-`GET /fetch_pdb_by_id/{pdb_id}` - Download PDB file of best matching struture from EBI and store it in the server's database
+`GET /fetch_pdb_by_id/{pdb_id}` - Download PDB file of best matching structure from EBI and store it in the server's database
 
 `GET /download_pdb/{pdb_id}` - Download PDB file from database to local directory
 
@@ -83,7 +83,7 @@ Valid database requests are
 
 Example: `store pdbs/A123.ent P05067 MLPGLALLLLAAWTARAL`
 
-## Installation Guide - Protien Structure Prediction Service
+## Installation Guide - Protein Structure Prediction Service
 Clone the repository
 To run locally with celery workers
 ```
@@ -101,8 +101,8 @@ docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 ## User Guide - Protein Structure Prediction Service
 
-The service can be interacted through OpenAPI endpoints.
-### OpenAPI
+The service can be interacted through FastAPI endpoints.
+### FastAPI
 `GET /predict` - Allows you to make a request for a prediction, you can pass in your sequence to the API through the endpoint
 ```
 /predict/?sequence={sequence}
